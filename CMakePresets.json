@@ -1,0 +1,15 @@
+{
+  "version": 8,
+  "configurePresets": [
+    {
+      "name": "MSVC_CUDA",
+      "displayName": "MSVC 2022 x64 with CUDA",
+      "description": "Build TinyLA with GPU support using MSVC + CUDA",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/out/build/MSVC_CUDA",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ]
+}
