@@ -12,12 +12,12 @@ static void test_tensor_creation_gpu() {
     Tensor* t = tensor(data, shape, 2, DEVICE_GPU);
     assert(t && t->ndim == 2 && t->numel == 6 && t->device == DEVICE_GPU);
 
-    double host_buf[6];
-    cudaMemcpy(host_buf, t->buffer, sizeof(double) * 6, cudaMemcpyDeviceToHost);
+    Tensor* host_out = to_cpu(t);
     for (size_t i = 0; i < 6; i++)
-        assert(host_buf[i] == data[i]);
+        assert(host_out->buffer[i] == data[i]);
 
     t->free(&t);
+    host_out->free(&host_out);
     printf("✓ GPU tensor creation passed\n");
 }
 
@@ -49,14 +49,14 @@ static void test_add_gpu() {
     int ret = add(out, a, b);
     assert(ret == 0);
 
-    double host_out[4];
-    cudaMemcpy(host_out, out->buffer, sizeof(double) * 4, cudaMemcpyDeviceToHost);
+    Tensor* host_out = to_cpu(out);
     for (size_t i = 0; i < 4; i++)
-        assert(host_out[i] == a_data[i] + b_data[i]);
+        assert(host_out->buffer[i] == a_data[i] + b_data[i]);
 
     a->free(&a);
     b->free(&b);
     out->free(&out);
+    host_out->free(&host_out);
     printf("✓ GPU add operation passed\n");
 }
 

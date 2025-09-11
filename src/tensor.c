@@ -97,21 +97,6 @@ void tensor_print(const Tensor* tensor) {
         return;
     }
 
-    // ===== Special case: 0D scalar =====
-    if (tensor->ndim == 0) {
-        double scalar;
-        if (tensor->device == DEVICE_GPU) {
-            if (tla_memcpy_safe(&scalar, tensor->buffer, sizeof(double), TLA_MEMCPY_DEVICE_TO_HOST) != 0) {
-                fprintf(stderr, "Failed to copy tensor buffer to host\n");
-                return;
-            }
-        } else
-            scalar = tensor->buffer[0];
-
-        printf("tensor(%.4g, device=%s, dtype=float64)\n", scalar, tensor->device == DEVICE_CPU ? "cpu" : "cuda");
-        return;
-    }
-
     // ===== Special case: empty tensor =====
     if (tensor->numel == 0) {
         printf("tensor([], shape=(");
@@ -125,29 +110,30 @@ void tensor_print(const Tensor* tensor) {
     }
 
     // ===== Handle CUDA tensors =====
-    double* host_buffer = NULL;
-    if (tensor->device == DEVICE_GPU) {
-        host_buffer = malloc(tensor->numel * sizeof(double)); // TODO: use pinned memory instead of malloc
-        if (tla_memcpy_safe(host_buffer, tensor->buffer, tensor->numel * sizeof(double), TLA_MEMCPY_DEVICE_TO_HOST) !=
-            0) {
-            fprintf(stderr, "Failed to copy tensor buffer to host\n");
-            return;
-        }
+    Tensor* host_tensor = to_cpu(tensor);
+    if (!host_tensor) {
+        fprintf(stderr, "Failed to copy tensor to host for printing\n");
+        return;
     }
 
-    Tensor host_tensor = *tensor;
-    if (host_buffer) {
-        host_tensor.buffer = host_buffer;
+    // ===== Special case: 0D scalar =====
+    if (tensor->ndim == 0) {
+        double scalar = host_tensor->buffer[0];
+        if (host_tensor != tensor) {
+            host_tensor->free(&host_tensor);
+        }
+
+        printf("tensor(%.4g, device=%s, dtype=float64)\n", scalar, tensor->device == DEVICE_CPU ? "cpu" : "cuda");
+        return;
     }
-    host_tensor.device = DEVICE_CPU;
 
     // ===== General case =====
     printf("tensor(");
-    _tensor_print_recursive(&host_tensor, 0, 0, 7);
+    _tensor_print_recursive(host_tensor, 0, 0, 7);
     printf(", device=%s, dtype=float64)\n", tensor->device == DEVICE_CPU ? "cpu" : "cuda");
 
-    if (host_buffer) {
-        free(host_buffer);
+    if (host_tensor != tensor) {
+        host_tensor->free(&host_tensor);
     }
 }
 
@@ -280,6 +266,39 @@ finalize:
 cleanup:
     tensor_free(&tensor);
     return NULL;
+}
+
+Tensor* to(const Tensor* tensor, Device device, int force_copy) {
+
+    if (!tensor) {
+        return NULL;
+    }
+    if (tensor->device == device && !force_copy) {
+        return (Tensor*)tensor;
+    }
+
+    Tensor* out = empty_tensor(tensor->shape, tensor->ndim, device);
+
+    TLAMemcpyKind kind;
+    if (tensor->device == DEVICE_CPU && device == DEVICE_CPU) {
+        kind = TLA_MEMCPY_HOST_TO_HOST;
+#ifdef TINYLA_CUDA_ENABLED
+    } else if (tensor->device == DEVICE_GPU && device == DEVICE_GPU) {
+        kind = TLA_MEMCPY_DEVICE_TO_DEVICE;
+    } else if (tensor->device == DEVICE_CPU && device == DEVICE_GPU) {
+        kind = TLA_MEMCPY_HOST_TO_DEVICE;
+    } else if (tensor->device == DEVICE_GPU && device == DEVICE_CPU) {
+        kind = TLA_MEMCPY_DEVICE_TO_HOST;
+    }
+#endif
+
+    if (tla_memcpy_safe(out->buffer, tensor->buffer, tensor->numel * sizeof(double), kind) != 0) {
+        fprintf(stderr, "Failed to copy tensor buffer in to()\n");
+        out->free(&out);
+        return NULL;
+    }
+
+    return out;
 }
 
 Tensor* tensor(const double* data, const size_t* shape, size_t ndim, Device device) {

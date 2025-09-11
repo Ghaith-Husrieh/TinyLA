@@ -20,6 +20,34 @@ struct ndarray {
 typedef struct ndarray Tensor;
 
 /**
+ * @brief Move a tensor to the specified device.
+ *
+ * If the tensor is already on the target device and `force_copy` is 0, it is returned as-is.
+ * Otherwise, a new tensor is created on the target device and data is copied.
+ *
+ * @param tensor Pointer to the tensor to move.
+ * @param device Target device (DEVICE_CPU or DEVICE_GPU).
+ * @param force_copy If non-zero, always create a new tensor even if already on target device.
+ *
+ * @return Pointer to the tensor on the requested device.
+ */
+Tensor* to(const Tensor* tensor, Device device, int force_copy);
+
+/**
+ * @brief Move a tensor to CPU.
+ *
+ * Convenience macro for to(tensor, DEVICE_CPU, 0).
+ */
+#define to_cpu(tensor) to(tensor, DEVICE_CPU, 0)
+
+/**
+ * @brief Move a tensor to GPU.
+ *
+ * Convenience macro for to(tensor, DEVICE_GPU, 0).
+ */
+#define to_gpu(tensor) to(tensor, DEVICE_GPU, 0)
+
+/**
  * @brief Creates a tensor with the provided data.
  *
  * This function creates a new tensor and initializes it with the provided data.
