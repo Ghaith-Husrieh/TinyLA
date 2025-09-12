@@ -3,10 +3,40 @@
 #include "tinyla/tensor.h"
 #include <stdio.h>
 
-static int validate_shapes(const Tensor** inputs, size_t n_inputs, const Tensor* out) {
+static int validate_tensors(const Tensor** inputs, size_t n_inputs, const Tensor* out, const char* op_name) {
     if (n_inputs == 0) {
         fprintf(stderr, "No input tensors provided.\n");
         return -1;
+    }
+
+    for (size_t i = 0; i < n_inputs; i++) {
+        if (!inputs[i]) {
+            fprintf(stderr, "%s: NULL tensor\n", op_name);
+            return -1;
+        }
+    }
+
+    if (!out) {
+        fprintf(stderr, "%s: NULL output tensor\n", op_name);
+        return -1;
+    }
+
+    Device device = inputs[0]->device;
+    for (size_t i = 1; i < n_inputs; i++) {
+        if (inputs[i]->device != device) {
+            fprintf(stderr, "%s: input tensor %zu device mismatch: got %d, expected %d\n", op_name, i,
+                    inputs[i]->device, device);
+            return -1;
+        }
+    }
+
+    if (out->device != device) {
+        fprintf(stderr, "%s: output tensor device mismatch: got %d, expected %d\n", op_name, out->device, device);
+        return -1;
+    }
+
+    if (out->numel == 0) {
+        return 0;
     }
 
     size_t ndim = inputs[0]->ndim;
@@ -43,24 +73,19 @@ static int validate_shapes(const Tensor** inputs, size_t n_inputs, const Tensor*
 }
 
 int add_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
-    if (!a || !b || !out) {
-        fprintf(stderr, "add_op_wrapper: NULL tensor\n");
-        return -1;
-    }
-
-    if (a->device != b->device || a->device != out->device) {
-        fprintf(stderr, "add_op_wrapper: tensors must be on same device\n");
-        return -1;
-    }
-
-    if (out->numel == 0) {
-        return 0;
-    }
-
     const Tensor* inputs[2] = {a, b};
-    if (validate_shapes(inputs, 2, out) != 0) {
+    if (validate_tensors(inputs, 2, out, "add_op_wrapper") != 0) {
         return -1;
     }
 
     return dispatch_op(OP_ADD, out, inputs, 2);
+}
+
+int sub_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
+    const Tensor* inputs[2] = {a, b};
+    if (validate_tensors(inputs, 2, out, "sub_op_wrapper") != 0) {
+        return -1;
+    }
+
+    return dispatch_op(OP_SUB, out, inputs, 2);
 }
