@@ -26,6 +26,12 @@ set(CORE_SOURCES
 )
 
 # ===========================
+# OpenMP Support
+# ===========================
+find_package(OpenMP REQUIRED COMPONENTS C)
+message(STATUS "OpenMP detected")
+
+# ===========================
 # CPU Kernels
 # ===========================
 file(GLOB_RECURSE SCALAR_KERNELS src/cpu/ops/scalar/*.c)
@@ -81,6 +87,20 @@ if(CUDAToolkit_FOUND)
     target_compile_definitions(TinyLA PRIVATE TINYLA_CUDA_ENABLED)
     target_link_libraries(TinyLA PRIVATE CUDA::cudart)
 endif()
+
+# Enable OpenMP features
+if(MSVC)
+    target_compile_options(cpu_scalar_objs  PRIVATE /openmp)
+    target_compile_options(cpu_vec128_objs  PRIVATE /openmp)
+    target_compile_options(cpu_vec256_objs  PRIVATE /openmp)
+else()
+    target_compile_options(cpu_scalar_objs  PRIVATE -fopenmp)
+    target_compile_options(cpu_vec128_objs  PRIVATE -fopenmp)
+    target_compile_options(cpu_vec256_objs  PRIVATE -fopenmp)
+
+    target_link_libraries(TinyLA PRIVATE OpenMP::OpenMP_C)
+endif()
+
 
 # Windows-specific: export all symbols
 set_target_properties(TinyLA PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
