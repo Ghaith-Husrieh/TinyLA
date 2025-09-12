@@ -1,7 +1,32 @@
 #include "dispatcher.h"
+#include "../cpu/cpu_features.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+DeviceKernel select_cpu_kernel(const CpuKernels* kernels) {
+    if (kernels->vec256 && has_avx2()) {
+        return kernels->vec256;
+    }
+
+    if (kernels->vec128 && has_sse42()) {
+        return kernels->vec128;
+    }
+
+    if (kernels->scalar) {
+        return kernels->scalar;
+    }
+
+    return NULL;
+}
+
+DeviceKernel select_gpu_kernel(DeviceKernel gpu_kernel) {
+#ifdef TINYLA_CUDA_ENABLED
+    return gpu_kernel;
+#else
+    return NULL;
+#endif
+}
 
 int register_op(OpType op, OpArity arity, DeviceKernel cpu_k, DeviceKernel gpu_k) {
     if (op < 0 || op >= OP_COUNT) {
@@ -52,7 +77,7 @@ int dispatch_op(OpType op, Tensor* out, const Tensor** inputs, const size_t n_in
         return -1;
     }
 
-    double** buffers = malloc(n_inputs * sizeof(double*));
+    const double** buffers = malloc(n_inputs * sizeof(double*));
     if (!buffers) {
         fprintf(stderr, "Failed to allocate memory for buffer pointers\n");
         return -1;

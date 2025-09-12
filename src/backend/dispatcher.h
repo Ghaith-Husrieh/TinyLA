@@ -16,7 +16,13 @@ typedef enum {
     OP_ARITY_TERNARY = 3,
 } OpArity;
 
-typedef int (*DeviceKernel)(double** inputs, double* out, size_t numel);
+typedef int (*DeviceKernel)(const double** inputs, double* out, size_t numel);
+
+typedef struct {
+    DeviceKernel scalar;
+    DeviceKernel vec128;
+    DeviceKernel vec256;
+} CpuKernels;
 
 typedef struct {
     OpArity arity;
@@ -27,6 +33,9 @@ typedef struct {
 } OpEntry;
 
 static OpEntry op_table[OP_COUNT];
+
+DeviceKernel select_cpu_kernel(const CpuKernels* kernels);
+DeviceKernel select_gpu_kernel(DeviceKernel gpu_kernel);
 
 int register_op(OpType op, OpArity arity, DeviceKernel cpu_k, DeviceKernel gpu_k);
 int dispatch_op(OpType op, Tensor* out, const Tensor** inputs, const size_t n_inputs);

@@ -53,6 +53,10 @@ int add_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
         return -1;
     }
 
+    if (out->numel == 0) {
+        return 0;
+    }
+
     const Tensor* inputs[2] = {a, b};
     if (validate_shapes(inputs, 2, out) != 0) {
         return -1;

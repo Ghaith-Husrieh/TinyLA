@@ -10,11 +10,6 @@ __global__ void ones_kernel(double* buffer, size_t numel) {
 }
 
 extern "C" void launch_ones_kernel(double* buffer, size_t numel) {
-
-    if (numel == 0) {
-        return;
-    }
-
     size_t threads = 256;
     size_t blocks = (numel + threads - 1) / threads;
     ones_kernel<<<blocks, threads>>>(buffer, numel);
