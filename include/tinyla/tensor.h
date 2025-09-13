@@ -62,9 +62,6 @@ Tensor* to(const Tensor* tensor, Device device, int force_copy);
  * @return Pointer to the created tensor on success, NULL on failure.
  *         Failure can occur due to invalid parameters, memory allocation
  *         failure, or GPU memory allocation failure (for DEVICE_GPU).
- *
- * @note The function copies the input data to the target device. For GPU tensors,
- *       the data is transferred from CPU to GPU memory.
  */
 Tensor* tensor(const double* data, const size_t* shape, size_t ndim, Device device);
 
@@ -82,14 +79,26 @@ Tensor* tensor(const double* data, const size_t* shape, size_t ndim, Device devi
  * @return Pointer to the created tensor on success, NULL on failure.
  *         The tensor memory contains undefined values and should be
  *         initialized before use.
- *
- * @note This is the fastest tensor creation method as it skips initialization.
- *       The user is responsible for initializing the tensor contents.
  */
 Tensor* empty_tensor(const size_t* shape, size_t ndim, Device device);
 
 /**
- * @brief Creates a tensor filled with zeros.
+ * @brief Creates an uninitialized tensor, matching the shape and device of another tensor.
+ *
+ * This function creates a new tensor with the same shape and device as the input tensor,
+ * but leaves the contents uninitialized. This is useful for creating tensors that match
+ * the dimensions of existing tensors without needing to specify the shape manually.
+ *
+ * @param tensor Reference tensor to match shape and device. Must not be NULL.
+ *
+ * @return Pointer to the created tensor on success, NULL on failure.
+ *         The returned tensor has the same shape and device as the input tensor.
+ *         The tensor memory contains undefined values and should be initialized before use.
+ */
+Tensor* empty_like_tensor(const Tensor* tensor);
+
+/**
+ * @brief Creates a tensor filled with zeroes.
  *
  * This function creates a new tensor and initializes all elements to zero.
  * The tensor is allocated on the specified device and all memory is set to 0.
@@ -100,11 +109,23 @@ Tensor* empty_tensor(const size_t* shape, size_t ndim, Device device);
  *
  * @return Pointer to the created tensor on success, NULL on failure.
  *         All elements in the returned tensor are initialized to 0.0.
- *
- * @note For GPU tensors, the zero initialization is performed on the GPU
- *       using cudaMemset for efficiency.
  */
 Tensor* zeroes_tensor(const size_t* shape, size_t ndim, Device device);
+
+/**
+ * @brief Creates a tensor filled with zeros, matching the shape and device of another tensor.
+ *
+ * This function creates a new tensor with the same shape and device as the input tensor,
+ * but initializes all elements to 0.0. This is useful for creating tensors that match
+ * the dimensions of existing tensors without needing to specify the shape manually.
+ *
+ * @param tensor Reference tensor to match shape and device. Must not be NULL.
+ *
+ * @return Pointer to the created tensor on success, NULL on failure.
+ *         All elements in the returned tensor are initialized to 0.0.
+ *         The returned tensor has the same shape and device as the input tensor.
+ */
+Tensor* zeroes_like_tensor(const Tensor* tensor);
 
 /**
  * @brief Creates a tensor filled with ones.
@@ -118,8 +139,20 @@ Tensor* zeroes_tensor(const size_t* shape, size_t ndim, Device device);
  *
  * @return Pointer to the created tensor on success, NULL on failure.
  *         All elements in the returned tensor are initialized to 1.0.
- *
- * @note For GPU tensors, the initialization is performed using a CUDA kernel
- *       for efficiency. For CPU tensors, a simple loop is used.
  */
 Tensor* ones_tensor(const size_t* shape, size_t ndim, Device device);
+
+/**
+ * @brief Creates a tensor filled with ones, matching the shape and device of another tensor.
+ *
+ * This function creates a new tensor with the same shape and device as the input tensor,
+ * but initializes all elements to 1.0. This is useful for creating tensors that match
+ * the dimensions of existing tensors without needing to specify the shape manually.
+ *
+ * @param tensor Reference tensor to match shape and device. Must not be NULL.
+ *
+ * @return Pointer to the created tensor on success, NULL on failure.
+ *         All elements in the returned tensor are initialized to 1.0.
+ *         The returned tensor has the same shape and device as the input tensor.
+ */
+Tensor* ones_like_tensor(const Tensor* tensor);

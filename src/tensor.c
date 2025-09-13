@@ -268,6 +268,15 @@ cleanup:
     return NULL;
 }
 
+static Tensor* _tensor_like(const Tensor* tensor, TensorInitMode init_mode) {
+    if (!tensor) {
+        fprintf(stderr, "Input tensor cannot be NULL for like function\n");
+        return NULL;
+    }
+
+    return _tensor_init(NULL, tensor->shape, tensor->ndim, tensor->device, init_mode);
+}
+
 Tensor* to(const Tensor* tensor, Device device, int force_copy) {
 
     if (!tensor) {
@@ -307,9 +316,12 @@ Tensor* tensor(const double* data, const size_t* shape, size_t ndim, Device devi
 Tensor* empty_tensor(const size_t* shape, size_t ndim, Device device) {
     return _tensor_init(NULL, shape, ndim, device, TENSOR_UNINITIALIZED);
 }
+Tensor* empty_like_tensor(const Tensor* tensor) { return _tensor_like(tensor, TENSOR_UNINITIALIZED); }
 Tensor* zeroes_tensor(const size_t* shape, size_t ndim, Device device) {
     return _tensor_init(NULL, shape, ndim, device, TENSOR_ZEROS);
 }
+Tensor* zeroes_like_tensor(const Tensor* tensor) { return _tensor_like(tensor, TENSOR_ZEROS); }
 Tensor* ones_tensor(const size_t* shape, size_t ndim, Device device) {
     return _tensor_init(NULL, shape, ndim, device, TENSOR_ONES);
 }
+Tensor* ones_like_tensor(const Tensor* tensor) { return _tensor_like(tensor, TENSOR_ONES); }
