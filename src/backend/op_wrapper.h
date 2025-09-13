@@ -7,3 +7,4 @@ static int validate_tensors(const Tensor** inputs, size_t n_inputs, const Tensor
 int add_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b);
 int sub_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b);
 int mul_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b);
+int div_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b);

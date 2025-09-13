@@ -7,6 +7,7 @@ typedef enum {
     OP_ADD,
     OP_SUB,
     OP_MUL,
+    OP_DIV,
 
     // Operation Count
     OP_COUNT,
