@@ -89,3 +89,12 @@ int sub_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
 
     return dispatch_op(OP_SUB, out, inputs, 2);
 }
+
+int mul_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
+    const Tensor* inputs[2] = {a, b};
+    if (validate_tensors(inputs, 2, out, "mul_op_wrapper") != 0) {
+        return -1;
+    }
+
+    return dispatch_op(OP_MUL, out, inputs, 2);
+}

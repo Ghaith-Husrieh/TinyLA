@@ -1,6 +1,5 @@
 #include "../cuda_macros.h"
 #include <cuda_runtime.h>
-#include <stdio.h>
 
 __global__ void add_kernel(const double* a, const double* b, double* out, size_t numel) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;

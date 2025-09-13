@@ -1,10 +1,12 @@
 #include "tinyla/init.h"
 #include "backend/dispatcher.h"
 #include "cpu/ops/add.h"
+#include "cpu/ops/mul.h"
 #include "cpu/ops/sub.h"
 
 #ifdef TINYLA_CUDA_ENABLED
 #include "cuda/ops/add.h"
+#include "cuda/ops/mul.h"
 #include "cuda/ops/sub.h"
 #endif
 
@@ -24,4 +26,12 @@ void tinyla_init(void) {
             .vec256 = cpu_sub_vec256,
     };
     register_op(OP_SUB, OP_ARITY_BINARY, select_cpu_kernel(&sub_kernels), select_gpu_kernel(gpu_sub_kernel));
+
+    // === Mul Kernels ===
+    CpuKernels mul_kernels = {
+            .scalar = cpu_mul_scalar,
+            .vec128 = cpu_mul_vec128,
+            .vec256 = cpu_mul_vec256,
+    };
+    register_op(OP_MUL, OP_ARITY_BINARY, select_cpu_kernel(&mul_kernels), select_gpu_kernel(gpu_mul_kernel));
 }

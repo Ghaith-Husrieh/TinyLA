@@ -6,6 +6,7 @@ typedef enum {
     // Binary Operations
     OP_ADD,
     OP_SUB,
+    OP_MUL,
 
     // Operation Count
     OP_COUNT,
