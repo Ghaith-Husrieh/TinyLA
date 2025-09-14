@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.1.0)
-project(TinyLA VERSION 0.1.0 LANGUAGES C CUDA)
+project(TinyLA VERSION 0.1.0 LANGUAGES C CXX CUDA)
 
 # ===========================
 # Compiler Standards
@@ -8,6 +8,8 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Remove DLL/lib prefixes on Windows (cleaner names)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
@@ -23,6 +25,7 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/backend/dispatcher.c
     ${PROJECT_SOURCE_DIR}/src/backend/op_wrapper.c
     ${PROJECT_SOURCE_DIR}/src/cpu/cpu_features.c
+    ${PROJECT_SOURCE_DIR}/src/rand/rand.cpp
 )
 
 # ===========================
@@ -59,8 +62,9 @@ find_package(CUDAToolkit QUIET)
 if(CUDAToolkit_FOUND)
     file(GLOB_RECURSE CUDA_KERNELS src/cuda/ops/*.cu)
     file(GLOB_RECURSE CUDA_INIT src/cuda/init/*.cu)
+    file(GLOB_RECURSE CUDA_RAND src/rand/*.cu)
 
-    set(CUDA_SOURCES ${CUDA_INIT} ${CUDA_KERNELS})
+    set(CUDA_SOURCES ${CUDA_INIT} ${CUDA_KERNELS} ${CUDA_RAND})
 
     message(STATUS "CUDAToolkit ${CUDAToolkit_VERSION} detected - GPU acceleration enabled")
 else()
