@@ -1,6 +1,10 @@
 #pragma once
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     DEVICE_CPU,
     DEVICE_GPU,
@@ -156,3 +160,7 @@ Tensor* ones_tensor(const size_t* shape, size_t ndim, Device device);
  *         The returned tensor has the same shape and device as the input tensor.
  */
 Tensor* ones_like_tensor(const Tensor* tensor);
+
+#ifdef __cplusplus
+}
+#endif

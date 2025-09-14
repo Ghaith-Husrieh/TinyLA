@@ -2,6 +2,10 @@
 #include "tinyla/tensor.h"
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     // Binary Operations
     OP_ADD,
@@ -42,3 +46,7 @@ DeviceKernel select_gpu_kernel(DeviceKernel gpu_kernel);
 
 int register_op(OpType op, OpArity arity, DeviceKernel cpu_k, DeviceKernel gpu_k);
 int dispatch_op(OpType op, Tensor* out, const Tensor** inputs, const size_t n_inputs);
+
+#ifdef __cplusplus
+}
+#endif

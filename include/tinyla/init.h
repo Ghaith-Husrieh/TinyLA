@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Initializes TinyLA operation kernels.
  *
@@ -8,3 +12,7 @@
  * on these kernels. Tensor creation functions do not require this.
  */
 void tinyla_init(void);
+
+#ifdef __cplusplus
+}
+#endif

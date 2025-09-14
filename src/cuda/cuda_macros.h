@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TLA_CUDA_CHECK(call)                                                                                           \
     do {                                                                                                               \
         cudaError_t err = (call);                                                                                      \
@@ -21,3 +25,7 @@
             exit(EXIT_FAILURE);                                                                                        \
         }                                                                                                              \
     } while (0)
+
+#ifdef __cplusplus
+}
+#endif

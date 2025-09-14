@@ -2,6 +2,10 @@
 #include "tinyla/tensor.h"
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     TLA_MEMCPY_HOST_TO_HOST,
     TLA_MEMCPY_HOST_TO_DEVICE,
@@ -17,3 +21,7 @@ int tla_memcpy_safe(void* dst, const void* src, size_t bytes, TLAMemcpyKind kind
 
 void tla_memset(Device device, void* ptr, int value, size_t bytes);
 void tla_memcpy(void* dst, const void* src, size_t bytes, TLAMemcpyKind kind);
+
+#ifdef __cplusplus
+}
+#endif

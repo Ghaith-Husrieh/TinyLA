@@ -2,6 +2,10 @@
 #include "../src/backend/op_wrapper.h"
 #include "tinyla/tinyla.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Performs element-wise addition of two tensors.
  *
@@ -53,3 +57,7 @@ static inline int mul(Tensor* out, const Tensor* a, const Tensor* b) { return mu
  * @return 0 on success, -1 on error (e.g., shape/device mismatch).
  */
 static inline int div(Tensor* out, const Tensor* a, const Tensor* b) { return div_op_wrapper(out, a, b); }
+
+#ifdef __cplusplus
+}
+#endif
