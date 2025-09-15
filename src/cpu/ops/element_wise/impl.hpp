@@ -2,7 +2,7 @@
 #include "functors.hpp"
 #include <immintrin.h>
 
-template <typename Op> int cpu_op_scalar_impl(const double** inputs, double* out, size_t numel) {
+template <typename Op> int cpu_element_wise_scalar_impl(const double** inputs, double* out, size_t numel) {
 #pragma omp parallel for
     for (int i = 0; i < (int)numel; i++) {
         out[i] = Op::apply(inputs[0][i], inputs[1][i]);
@@ -11,7 +11,7 @@ template <typename Op> int cpu_op_scalar_impl(const double** inputs, double* out
     return 0;
 }
 
-template <typename Op> int cpu_op_vec128_impl(const double** inputs, double* out, size_t numel) {
+template <typename Op> int cpu_element_wise_vec128_impl(const double** inputs, double* out, size_t numel) {
 #pragma omp parallel for
     for (int i = 0; i < (int)numel; i += 2) {
         if (i + 1 < (int)numel) {
@@ -27,7 +27,7 @@ template <typename Op> int cpu_op_vec128_impl(const double** inputs, double* out
     return 0;
 }
 
-template <typename Op> int cpu_op_vec256_impl(const double** inputs, double* out, size_t numel) {
+template <typename Op> int cpu_element_wise_vec256_impl(const double** inputs, double* out, size_t numel) {
 #pragma omp parallel for
     for (int i = 0; i < (int)numel; i += 4) {
         if (i + 3 < (int)numel) {

@@ -1,9 +1,9 @@
 #include "tinyla/init.h"
 #include "backend/dispatcher.h"
-#include "cpu/ops/element_wise.h"
+#include "cpu/ops/element_wise/element_wise.h"
 
 #ifdef TINYLA_CUDA_ENABLED
-#include "cuda/ops/element_wise.h"
+#include "cuda/ops/element_wise/element_wise.h"
 #endif
 
 void tinyla_init(void) {

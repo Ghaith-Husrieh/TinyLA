@@ -26,8 +26,11 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/backend/op_wrapper.c
     ${PROJECT_SOURCE_DIR}/src/cpu/cpu_features.c
     ${PROJECT_SOURCE_DIR}/src/rand/rand.cpp
-    ${PROJECT_SOURCE_DIR}/src/cpu/ops/element_wise.cpp
 )
+
+file(GLOB_RECURSE CPU_KERNELS ${PROJECT_SOURCE_DIR}/src/cpu/ops/element_wise/*.cpp)
+
+set(CORE_SOURCES ${CORE_SOURCES} ${CPU_KERNELS})
 
 # ===========================
 # OpenMP Support
@@ -40,7 +43,7 @@ message(STATUS "OpenMP detected")
 # ===========================
 find_package(CUDAToolkit QUIET)
 if(CUDAToolkit_FOUND)
-    file(GLOB_RECURSE CUDA_KERNELS src/cuda/ops/*.cu)
+    file(GLOB_RECURSE CUDA_KERNELS src/cuda/ops/element_wise/*.cu)
     file(GLOB_RECURSE CUDA_INIT src/cuda/init/*.cu)
     file(GLOB_RECURSE CUDA_RAND src/rand/*.cu)
 
