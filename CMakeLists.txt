@@ -26,34 +26,14 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/backend/op_wrapper.c
     ${PROJECT_SOURCE_DIR}/src/cpu/cpu_features.c
     ${PROJECT_SOURCE_DIR}/src/rand/rand.cpp
+    ${PROJECT_SOURCE_DIR}/src/cpu/ops/element_wise.cpp
 )
 
 # ===========================
 # OpenMP Support
 # ===========================
-find_package(OpenMP REQUIRED COMPONENTS C)
+find_package(OpenMP REQUIRED COMPONENTS CXX)
 message(STATUS "OpenMP detected")
-
-# ===========================
-# CPU Kernels
-# ===========================
-file(GLOB_RECURSE SCALAR_KERNELS src/cpu/ops/scalar/*.c)
-file(GLOB_RECURSE VEC128_KERNELS src/cpu/ops/vec128/*.c)
-file(GLOB_RECURSE VEC256_KERNELS src/cpu/ops/vec256/*.c)
-
-# Create object libraries dynamically
-add_library(cpu_scalar_objs OBJECT ${SCALAR_KERNELS})
-add_library(cpu_vec128_objs OBJECT ${VEC128_KERNELS})
-add_library(cpu_vec256_objs OBJECT ${VEC256_KERNELS})
-
-# Compile flags per ISA
-if(MSVC)
-    target_compile_options(cpu_vec128_objs PRIVATE /arch:SSE2)
-    target_compile_options(cpu_vec256_objs PRIVATE /arch:AVX2)
-else()
-    target_compile_options(cpu_vec128_objs PRIVATE -msse4.2)
-    target_compile_options(cpu_vec256_objs PRIVATE -mavx2)
-endif()
 
 # ===========================
 # CUDA Support (Optional)
@@ -76,15 +56,13 @@ endif()
 # Build TinyLA Shared Library
 # ===========================
 add_library(TinyLA SHARED
-    $<TARGET_OBJECTS:cpu_scalar_objs>
-    $<TARGET_OBJECTS:cpu_vec128_objs>
-    $<TARGET_OBJECTS:cpu_vec256_objs>
     ${CORE_SOURCES}
     ${CUDA_SOURCES}
 )
 
 # Include headers
 target_include_directories(TinyLA PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(TinyLA PUBLIC ${PROJECT_SOURCE_DIR}/src/)
 
 # Enable CUDA features if available
 if(CUDAToolkit_FOUND)
@@ -94,15 +72,16 @@ endif()
 
 # Enable OpenMP features
 if(MSVC)
-    target_compile_options(cpu_scalar_objs  PRIVATE /openmp)
-    target_compile_options(cpu_vec128_objs  PRIVATE /openmp)
-    target_compile_options(cpu_vec256_objs  PRIVATE /openmp)
+    target_compile_options(TinyLA PRIVATE 
+        $<$<COMPILE_LANGUAGE:CXX>:/openmp>
+        $<$<COMPILE_LANGUAGE:C>:/openmp>
+    )
 else()
-    target_compile_options(cpu_scalar_objs  PRIVATE -fopenmp)
-    target_compile_options(cpu_vec128_objs  PRIVATE -fopenmp)
-    target_compile_options(cpu_vec256_objs  PRIVATE -fopenmp)
-
-    target_link_libraries(TinyLA PRIVATE OpenMP::OpenMP_C)
+    target_compile_options(TinyLA PRIVATE 
+        $<$<COMPILE_LANGUAGE:CXX>:-fopenmp>
+        $<$<COMPILE_LANGUAGE:C>:-fopenmp>
+    )
+    target_link_libraries(TinyLA PRIVATE OpenMP::OpenMP_C OpenMP::OpenMP_CXX)
 endif()
 
 

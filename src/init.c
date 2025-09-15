@@ -1,9 +1,6 @@
 #include "tinyla/init.h"
 #include "backend/dispatcher.h"
-#include "cpu/ops/add.h"
-#include "cpu/ops/div.h"
-#include "cpu/ops/mul.h"
-#include "cpu/ops/sub.h"
+#include "cpu/ops/element_wise.h"
 
 #ifdef TINYLA_CUDA_ENABLED
 #include "cuda/ops/add.h"
