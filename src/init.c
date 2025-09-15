@@ -3,10 +3,7 @@
 #include "cpu/ops/element_wise.h"
 
 #ifdef TINYLA_CUDA_ENABLED
-#include "cuda/ops/add.h"
-#include "cuda/ops/div.h"
-#include "cuda/ops/mul.h"
-#include "cuda/ops/sub.h"
+#include "cuda/ops/element_wise.h"
 #endif
 
 void tinyla_init(void) {
@@ -16,7 +13,7 @@ void tinyla_init(void) {
             .vec128 = cpu_add_vec128,
             .vec256 = cpu_add_vec256,
     };
-    register_op(OP_ADD, OP_ARITY_BINARY, select_cpu_kernel(&add_kernels), select_gpu_kernel(gpu_add_kernel));
+    register_op(OP_ADD, OP_ARITY_BINARY, select_cpu_kernel(&add_kernels), select_gpu_kernel(cuda_add));
 
     // === Sub Kernels ===
     CpuKernels sub_kernels = {
@@ -24,7 +21,7 @@ void tinyla_init(void) {
             .vec128 = cpu_sub_vec128,
             .vec256 = cpu_sub_vec256,
     };
-    register_op(OP_SUB, OP_ARITY_BINARY, select_cpu_kernel(&sub_kernels), select_gpu_kernel(gpu_sub_kernel));
+    register_op(OP_SUB, OP_ARITY_BINARY, select_cpu_kernel(&sub_kernels), select_gpu_kernel(cuda_sub));
 
     // === Mul Kernels ===
     CpuKernels mul_kernels = {
@@ -32,7 +29,7 @@ void tinyla_init(void) {
             .vec128 = cpu_mul_vec128,
             .vec256 = cpu_mul_vec256,
     };
-    register_op(OP_MUL, OP_ARITY_BINARY, select_cpu_kernel(&mul_kernels), select_gpu_kernel(gpu_mul_kernel));
+    register_op(OP_MUL, OP_ARITY_BINARY, select_cpu_kernel(&mul_kernels), select_gpu_kernel(cuda_mul));
 
     // === Div Kernels ===
     CpuKernels div_kernels = {
@@ -40,5 +37,5 @@ void tinyla_init(void) {
             .vec128 = cpu_div_vec128,
             .vec256 = cpu_div_vec256,
     };
-    register_op(OP_DIV, OP_ARITY_BINARY, select_cpu_kernel(&div_kernels), select_gpu_kernel(gpu_div_kernel));
+    register_op(OP_DIV, OP_ARITY_BINARY, select_cpu_kernel(&div_kernels), select_gpu_kernel(cuda_div));
 }
