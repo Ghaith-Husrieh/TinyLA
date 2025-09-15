@@ -43,7 +43,7 @@ static void test_add_cpu() {
     Tensor* b = tensor(b_data, shape, 1, DEVICE_CPU);
     Tensor* out = empty_tensor(shape, 1, DEVICE_CPU);
 
-    int ret = add(out, a, b);
+    int ret = tla_add(out, a, b);
     assert(ret == 0);
 
     for (size_t i = 0; i < 4; i++)

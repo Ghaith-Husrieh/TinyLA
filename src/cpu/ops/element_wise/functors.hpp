@@ -1,5 +1,5 @@
 #pragma once
-#include <immintrin.h> // For SIMD intrinsics
+#include <immintrin.h>
 
 struct AddOp {
     static double apply(double a, double b) { return a + b; }

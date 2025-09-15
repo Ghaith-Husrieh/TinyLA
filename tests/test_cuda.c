@@ -46,7 +46,7 @@ static void test_add_gpu() {
     Tensor* b = tensor(b_data, shape, 1, DEVICE_GPU);
     Tensor* out = empty_tensor(shape, 1, DEVICE_GPU);
 
-    int ret = add(out, a, b);
+    int ret = tla_add(out, a, b);
     assert(ret == 0);
 
     Tensor* host_out = to_cpu(out);
