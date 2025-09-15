@@ -21,3 +21,8 @@ int cuda_mul(const double** inputs, double* out, size_t numel) {
 int cuda_div(const double** inputs, double* out, size_t numel) {
     return cuda_element_wise_impl<DivOp>(inputs[0], inputs[1], out, numel);
 }
+
+// Pow operations
+int cuda_pow(const double** inputs, double* out, size_t numel) {
+    return cuda_element_wise_impl<PowOp>(inputs[0], inputs[1], out, numel);
+}

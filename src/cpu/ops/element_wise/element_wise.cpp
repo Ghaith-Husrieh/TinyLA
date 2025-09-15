@@ -53,3 +53,16 @@ int cpu_div_vec128(const double** inputs, double* out, size_t numel) {
 int cpu_div_vec256(const double** inputs, double* out, size_t numel) {
     return cpu_element_wise_vec256_impl<DivOp>(inputs, out, numel);
 }
+
+// Pow operations
+int cpu_pow_scalar(const double** inputs, double* out, size_t numel) {
+    return cpu_element_wise_scalar_impl<PowOp>(inputs, out, numel);
+}
+
+int cpu_pow_vec128(const double** inputs, double* out, size_t numel) {
+    return cpu_element_wise_vec128_impl<PowOp>(inputs, out, numel);
+}
+
+int cpu_pow_vec256(const double** inputs, double* out, size_t numel) {
+    return cpu_element_wise_vec256_impl<PowOp>(inputs, out, numel);
+}

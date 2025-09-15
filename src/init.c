@@ -38,4 +38,12 @@ void tinyla_init(void) {
             .vec256 = cpu_div_vec256,
     };
     register_op(OP_DIV, OP_ARITY_BINARY, select_cpu_kernel(&div_kernels), select_gpu_kernel(cuda_div));
+
+    // === Pow Kernels ===
+    CpuKernels pow_kernels = {
+            .scalar = cpu_pow_scalar,
+            .vec128 = cpu_pow_vec128,
+            .vec256 = cpu_pow_vec256,
+    };
+    register_op(OP_POW, OP_ARITY_BINARY, select_cpu_kernel(&pow_kernels), select_gpu_kernel(cuda_pow));
 }

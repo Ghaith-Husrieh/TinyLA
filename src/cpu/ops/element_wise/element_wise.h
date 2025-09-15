@@ -25,6 +25,11 @@ int cpu_div_scalar(const double** inputs, double* out, size_t numel);
 int cpu_div_vec128(const double** inputs, double* out, size_t numel);
 int cpu_div_vec256(const double** inputs, double* out, size_t numel);
 
+// Pow operations
+int cpu_pow_scalar(const double** inputs, double* out, size_t numel);
+int cpu_pow_vec128(const double** inputs, double* out, size_t numel);
+int cpu_pow_vec256(const double** inputs, double* out, size_t numel);
+
 #ifdef __cplusplus
 }
 #endif

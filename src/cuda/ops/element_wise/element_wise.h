@@ -9,6 +9,7 @@ int cuda_add(const double** inputs, double* out, size_t numel);
 int cuda_sub(const double** inputs, double* out, size_t numel);
 int cuda_mul(const double** inputs, double* out, size_t numel);
 int cuda_div(const double** inputs, double* out, size_t numel);
+int cuda_pow(const double** inputs, double* out, size_t numel);
 
 #ifdef __cplusplus
 }

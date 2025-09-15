@@ -59,6 +59,20 @@ static inline int tla_mul(Tensor* out, const Tensor* a, const Tensor* b) { retur
  */
 static inline int tla_div(Tensor* out, const Tensor* a, const Tensor* b) { return div_op_wrapper(out, a, b); }
 
+/**
+ * @brief Performs element-wise power operation of two tensors.
+ *
+ * The tensors must have the same shape and reside on the same device.
+ * Computes a^b for each element.
+ *
+ * @param out Pointer to the output tensor.
+ * @param a   Pointer to the first input tensor (base).
+ * @param b   Pointer to the second input tensor (exponent).
+ *
+ * @return 0 on success, -1 on error (e.g., shape/device mismatch).
+ */
+static inline int tla_pow(Tensor* out, const Tensor* a, const Tensor* b) { return pow_op_wrapper(out, a, b); }
+
 #ifdef __cplusplus
 }
 // === C++ interface ===
@@ -115,6 +129,20 @@ static inline int mul(Tensor* out, const Tensor* a, const Tensor* b) { return mu
  * @return 0 on success, -1 on error (e.g., shape/device mismatch).
  */
 static inline int div(Tensor* out, const Tensor* a, const Tensor* b) { return div_op_wrapper(out, a, b); }
+
+/**
+ * @brief Performs element-wise power operation of two tensors.
+ *
+ * The tensors must have the same shape and reside on the same device.
+ * Computes a^b for each element.
+ *
+ * @param out Pointer to the output tensor.
+ * @param a   Pointer to the first input tensor (base).
+ * @param b   Pointer to the second input tensor (exponent).
+ *
+ * @return 0 on success, -1 on error (e.g., shape/device mismatch).
+ */
+static inline int pow(Tensor* out, const Tensor* a, const Tensor* b) { return pow_op_wrapper(out, a, b); }
 } // namespace tla
 
 #endif
