@@ -24,7 +24,7 @@ typedef enum {
     OP_ARITY_TERNARY = 3,
 } OpArity;
 
-typedef int (*DeviceKernel)(const double** inputs, double* out, size_t numel);
+typedef int (*DeviceKernel)(Tensor* out, const Tensor** inputs, const size_t n_inputs);
 
 typedef struct {
     DeviceKernel scalar;

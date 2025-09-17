@@ -77,18 +77,7 @@ int dispatch_op(OpType op, Tensor* out, const Tensor** inputs, const size_t n_in
         return -1;
     }
 
-    const double** buffers = malloc(n_inputs * sizeof(double*));
-    if (!buffers) {
-        fprintf(stderr, "Failed to allocate memory for buffer pointers\n");
-        return -1;
-    }
-
-    for (size_t i = 0; i < n_inputs; i++) {
-        buffers[i] = inputs[i]->buffer;
-    }
-
-    int result = kernel(buffers, out->buffer, out->numel);
-    free(buffers);
+    int result = kernel(out, inputs, n_inputs);
 
     return result;
 }
