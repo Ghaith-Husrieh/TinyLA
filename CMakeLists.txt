@@ -16,6 +16,15 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 set(CMAKE_IMPORT_LIBRARY_PREFIX "")
 
 # ===========================
+# Compiler Features
+# ===========================
+
+if (NOT MSVC)
+    include(CheckSymbolExists)
+    check_symbol_exists(posix_memalign "stdlib.h" HAVE_POSIX_MEMALIGN)
+endif()
+
+# ===========================
 # Core Sources
 # ===========================
 set(CORE_SOURCES
@@ -25,6 +34,7 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/backend/dispatcher.c
     ${PROJECT_SOURCE_DIR}/src/backend/op_wrapper.c
     ${PROJECT_SOURCE_DIR}/src/cpu/cpu_features.c
+    ${PROJECT_SOURCE_DIR}/src/cpu/alignment.c
     ${PROJECT_SOURCE_DIR}/src/rand/rand.cpp
 )
 
@@ -62,6 +72,10 @@ add_library(TinyLA SHARED
     ${CORE_SOURCES}
     ${CUDA_SOURCES}
 )
+
+if (HAVE_POSIX_MEMALIGN)
+target_compile_definitions(TinyLA PRIVATE HAVE_POSIX_MEMALIGN)
+endif()
 
 # Include headers
 target_include_directories(TinyLA PUBLIC ${PROJECT_SOURCE_DIR}/include)

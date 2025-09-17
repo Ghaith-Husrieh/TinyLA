@@ -1,4 +1,6 @@
 #include "tla_alloc.h"
+#include <cpu/alignment.h>
+#include <cpu/cpu_features.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,8 +10,9 @@
 #endif
 
 void* tla_malloc(Device device, size_t bytes) {
-#ifdef TINYLA_CUDA_ENABLED
     size_t required_bytes = bytes == 0 ? 1 : bytes;
+
+#ifdef TINYLA_CUDA_ENABLED
     if (device == DEVICE_GPU) {
         void* ptr = NULL;
         if (cudaMalloc(&ptr, required_bytes) != cudaSuccess)
@@ -17,7 +20,9 @@ void* tla_malloc(Device device, size_t bytes) {
         return ptr;
     }
 #endif
-    return malloc(required_bytes);
+
+    size_t alignment = has_avx2() ? 32 : 16;
+    return tla_aligned_malloc(required_bytes, alignment);
 }
 
 void tla_free(Device device, void* ptr) {
@@ -30,7 +35,7 @@ void tla_free(Device device, void* ptr) {
         return;
     }
 #endif
-    free(ptr);
+    tla_aligned_free(ptr);
 }
 
 int tla_memset_safe(Device device, void* ptr, int value, size_t bytes) {
