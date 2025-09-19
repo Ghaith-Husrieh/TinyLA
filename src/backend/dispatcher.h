@@ -13,6 +13,7 @@ typedef enum {
     OP_MUL,
     OP_DIV,
     OP_POW,
+    OP_MATMUL,
 
     // Operation Count
     OP_COUNT,

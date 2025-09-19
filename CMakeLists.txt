@@ -38,14 +38,17 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/rand/rand.cpp
 )
 
-file(GLOB_RECURSE CPU_KERNELS ${PROJECT_SOURCE_DIR}/src/cpu/ops/element_wise/*.cpp)
+file(GLOB_RECURSE CPU_KERNELS 
+    ${PROJECT_SOURCE_DIR}/src/cpu/ops/element_wise/*.cpp 
+    ${PROJECT_SOURCE_DIR}/src/cpu/ops/gemm/*.cpp
+)
 
 set(CORE_SOURCES ${CORE_SOURCES} ${CPU_KERNELS})
 
 # ===========================
 # OpenMP Support
 # ===========================
-find_package(OpenMP REQUIRED COMPONENTS CXX)
+find_package(OpenMP REQUIRED COMPONENTS C CXX)
 message(STATUS "OpenMP detected")
 
 # ===========================
@@ -90,8 +93,8 @@ endif()
 # Enable OpenMP features
 if(MSVC)
     target_compile_options(TinyLA PRIVATE 
-        $<$<COMPILE_LANGUAGE:CXX>:/openmp>
-        $<$<COMPILE_LANGUAGE:C>:/openmp>
+        $<$<COMPILE_LANGUAGE:CXX>:/openmp:llvm>
+        $<$<COMPILE_LANGUAGE:C>:/openmp:llvm>
     )
 else()
     target_compile_options(TinyLA PRIVATE 

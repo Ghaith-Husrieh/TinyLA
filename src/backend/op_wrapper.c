@@ -116,3 +116,12 @@ int pow_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
 
     return dispatch_op(OP_POW, out, inputs, 2);
 }
+
+int matmul_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
+    const Tensor* inputs[2] = {a, b};
+    if (validate_tensors(inputs, 2, out, "matmul_op_wrapper") != 0) {
+        return -1;
+    }
+
+    return dispatch_op(OP_MATMUL, out, inputs, 2);
+}

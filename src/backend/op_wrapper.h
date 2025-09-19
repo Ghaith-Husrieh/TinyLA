@@ -13,6 +13,7 @@ int sub_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b);
 int mul_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b);
 int div_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b);
 int pow_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b);
+int matmul_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b);
 
 #ifdef __cplusplus
 }

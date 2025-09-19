@@ -1,6 +1,7 @@
 #include "tinyla/init.h"
 #include "backend/dispatcher.h"
 #include "cpu/ops/element_wise/element_wise.h"
+#include "cpu/ops/gemm/gemm.h"
 
 #ifdef TINYLA_CUDA_ENABLED
 #include "cuda/ops/element_wise/element_wise.h"
@@ -46,4 +47,12 @@ void tinyla_init(void) {
             .vec256 = cpu_pow_vec256,
     };
     register_op(OP_POW, OP_ARITY_BINARY, select_cpu_kernel(&pow_kernels), select_gpu_kernel(cuda_pow));
+
+    // === Matmul Kernels ===
+    CpuKernels matmul_kernels = {
+            .scalar = cpu_gemm_scalar,
+            .vec128 = cpu_gemm_vec128,
+            .vec256 = cpu_gemm_vec256,
+    };
+    register_op(OP_MATMUL, OP_ARITY_BINARY, select_cpu_kernel(&matmul_kernels), select_gpu_kernel(NULL));
 }
