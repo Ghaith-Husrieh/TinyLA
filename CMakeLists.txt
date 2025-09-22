@@ -56,7 +56,10 @@ message(STATUS "OpenMP detected")
 # ===========================
 find_package(CUDAToolkit QUIET)
 if(CUDAToolkit_FOUND)
-    file(GLOB_RECURSE CUDA_KERNELS src/cuda/ops/element_wise/*.cu)
+    file(GLOB_RECURSE CUDA_KERNELS 
+    src/cuda/ops/element_wise/*.cu
+    src/cuda/ops/gemm/*.cu
+    )
     file(GLOB_RECURSE CUDA_INIT src/cuda/init/*.cu)
     file(GLOB_RECURSE CUDA_RAND src/rand/*.cu)
 

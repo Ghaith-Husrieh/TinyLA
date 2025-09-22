@@ -5,6 +5,7 @@
 
 #ifdef TINYLA_CUDA_ENABLED
 #include "cuda/ops/element_wise/element_wise.h"
+#include "cuda/ops/gemm/gemm.h"
 #endif
 
 void tinyla_init(void) {
@@ -54,5 +55,5 @@ void tinyla_init(void) {
             .vec128 = cpu_gemm_vec128,
             .vec256 = cpu_gemm_vec256,
     };
-    register_op(OP_MATMUL, OP_ARITY_BINARY, select_cpu_kernel(&matmul_kernels), select_gpu_kernel(NULL));
+    register_op(OP_MATMUL, OP_ARITY_BINARY, select_cpu_kernel(&matmul_kernels), select_gpu_kernel(cuda_gemm));
 }
