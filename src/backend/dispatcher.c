@@ -46,7 +46,7 @@ int register_op(OpType op, OpArity arity, DeviceKernel cpu_k, DeviceKernel gpu_k
     return 0;
 }
 
-int dispatch_op(OpType op, Tensor* out, const Tensor** inputs, const size_t n_inputs) {
+int dispatch_op(OpType op, tensor_desc* out, const tensor_desc** inputs, const size_t n_inputs) {
     if (op < 0 || op >= OP_COUNT) {
         fprintf(stderr, "Invalid op type: %d\n", op);
         return -1;
@@ -63,7 +63,7 @@ int dispatch_op(OpType op, Tensor* out, const Tensor** inputs, const size_t n_in
         kernel = entry->cpu_kernel;
     }
 #ifdef TINYLA_CUDA_ENABLED
-    else if (inputs[0]->device == DEVICE_GPU) {
+    else if (inputs[0]->device == DEVICE_CUDA) {
         kernel = entry->gpu_kernel;
     }
 #endif

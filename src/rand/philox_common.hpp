@@ -51,13 +51,7 @@ TLA_INLINE PhiloxCtr philox_4x32_10(PhiloxCtr ctr, PhiloxKey key) {
     return ctr;
 }
 
-template <typename Derived> struct PhiloxGenerator {
-    TLA_INLINE void generate(PhiloxState& st, double out[4], size_t thread_offset = 0) {
-        Derived::generate(st, out, thread_offset);
-    }
-};
-
-struct PhiloxUniform : public PhiloxGenerator<PhiloxUniform> {
+struct PhiloxUniform {
     TLA_INLINE static void generate(PhiloxState& st, double out[4], size_t thread_offset = 0) {
         PhiloxCtr ctr;
         PhiloxKey key;
@@ -83,7 +77,7 @@ struct PhiloxUniform : public PhiloxGenerator<PhiloxUniform> {
     }
 };
 
-struct PhiloxNormal : public PhiloxGenerator<PhiloxNormal> {
+struct PhiloxNormal {
     TLA_INLINE static void generate(PhiloxState& st, double out[4], size_t thread_offset = 0) {
         double u[4];
         PhiloxUniform::generate(st, u, thread_offset);

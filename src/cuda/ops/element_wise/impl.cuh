@@ -11,7 +11,8 @@ __global__ void element_wise_kernel(double* out, const double* a, const double* 
     }
 }
 
-template <typename Op> int cuda_element_wise_impl(Tensor* out, const Tensor* a, const Tensor* b, const size_t numel) {
+template <typename Op>
+int cuda_element_wise_impl(tensor_desc* out, const tensor_desc* a, const tensor_desc* b, const size_t numel) {
     const size_t block_size = 256;
     const size_t grid_size = (numel + block_size - 1) / block_size;
 

@@ -1,9 +1,7 @@
 #include "op_wrapper.h"
-#include "dispatcher.h"
-#include "tinyla/tensor.h"
 #include <stdio.h>
 
-static int validate_tensors(const Tensor** inputs, size_t n_inputs, const Tensor* out, const char* op_name) {
+static int validate_tensors(const tensor_desc** inputs, size_t n_inputs, const tensor_desc* out, const char* op_name) {
     if (n_inputs == 0) {
         fprintf(stderr, "No input tensors provided.\n");
         return -1;
@@ -21,7 +19,7 @@ static int validate_tensors(const Tensor** inputs, size_t n_inputs, const Tensor
         return -1;
     }
 
-    Device device = inputs[0]->device;
+    device device = inputs[0]->device;
     for (size_t i = 1; i < n_inputs; i++) {
         if (inputs[i]->device != device) {
             fprintf(stderr, "%s: input tensor %zu device mismatch: got %d, expected %d\n", op_name, i,
@@ -72,56 +70,9 @@ static int validate_tensors(const Tensor** inputs, size_t n_inputs, const Tensor
     return 0;
 }
 
-int add_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
-    const Tensor* inputs[2] = {a, b};
-    if (validate_tensors(inputs, 2, out, "add_op_wrapper") != 0) {
-        return -1;
-    }
-
-    return dispatch_op(OP_ADD, out, inputs, 2);
-}
-
-int sub_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
-    const Tensor* inputs[2] = {a, b};
-    if (validate_tensors(inputs, 2, out, "sub_op_wrapper") != 0) {
-        return -1;
-    }
-
-    return dispatch_op(OP_SUB, out, inputs, 2);
-}
-
-int mul_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
-    const Tensor* inputs[2] = {a, b};
-    if (validate_tensors(inputs, 2, out, "mul_op_wrapper") != 0) {
-        return -1;
-    }
-
-    return dispatch_op(OP_MUL, out, inputs, 2);
-}
-
-int div_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
-    const Tensor* inputs[2] = {a, b};
-    if (validate_tensors(inputs, 2, out, "div_op_wrapper") != 0) {
-        return -1;
-    }
-
-    return dispatch_op(OP_DIV, out, inputs, 2);
-}
-
-int pow_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
-    const Tensor* inputs[2] = {a, b};
-    if (validate_tensors(inputs, 2, out, "pow_op_wrapper") != 0) {
-        return -1;
-    }
-
-    return dispatch_op(OP_POW, out, inputs, 2);
-}
-
-int matmul_op_wrapper(Tensor* out, const Tensor* a, const Tensor* b) {
-    const Tensor* inputs[2] = {a, b};
-    if (validate_tensors(inputs, 2, out, "matmul_op_wrapper") != 0) {
-        return -1;
-    }
-
-    return dispatch_op(OP_MATMUL, out, inputs, 2);
-}
+BINARY_OP_WRAPPER(add, OP_ADD)
+BINARY_OP_WRAPPER(sub, OP_SUB)
+BINARY_OP_WRAPPER(mul, OP_MUL)
+BINARY_OP_WRAPPER(div, OP_DIV)
+BINARY_OP_WRAPPER(pow, OP_POW)
+BINARY_OP_WRAPPER(matmul, OP_MATMUL)

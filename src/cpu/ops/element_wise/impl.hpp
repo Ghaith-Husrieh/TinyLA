@@ -1,11 +1,11 @@
 #pragma once
+#include "../../../memory/tensor_desc.h"
 #include "functors.hpp"
-#include "tinyla/tensor.h"
 #include <immintrin.h>
 #include <omp.h>
 
 template <typename Op>
-int cpu_element_wise_scalar_impl(Tensor* out, const Tensor* a, const Tensor* b, const size_t numel) {
+int cpu_element_wise_scalar_impl(tensor_desc* out, const tensor_desc* a, const tensor_desc* b, const size_t numel) {
 #pragma omp parallel for
     for (int i = 0; i < (int)numel; i++) {
         out->buffer[i] = Op::apply(a->buffer[i], b->buffer[i]);
@@ -15,7 +15,7 @@ int cpu_element_wise_scalar_impl(Tensor* out, const Tensor* a, const Tensor* b, 
 }
 
 template <typename Op>
-int cpu_element_wise_vec128_impl(Tensor* out, const Tensor* a, const Tensor* b, const size_t numel) {
+int cpu_element_wise_vec128_impl(tensor_desc* out, const tensor_desc* a, const tensor_desc* b, const size_t numel) {
 #pragma omp parallel for
     for (int i = 0; i < (int)numel; i += 2) {
         if (i + 1 < (int)numel) {
@@ -32,7 +32,7 @@ int cpu_element_wise_vec128_impl(Tensor* out, const Tensor* a, const Tensor* b, 
 }
 
 template <typename Op>
-int cpu_element_wise_vec256_impl(Tensor* out, const Tensor* a, const Tensor* b, const size_t numel) {
+int cpu_element_wise_vec256_impl(tensor_desc* out, const tensor_desc* a, const tensor_desc* b, const size_t numel) {
 #pragma omp parallel for
     for (int i = 0; i < (int)numel; i += 4) {
         if (i + 3 < (int)numel) {

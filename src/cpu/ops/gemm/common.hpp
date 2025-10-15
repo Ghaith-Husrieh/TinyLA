@@ -1,5 +1,5 @@
 #pragma once
-#include "tinyla/tensor.h"
+#include "../../../memory/tensor_desc.h"
 #include <malloc.h>
 
 #ifdef __cplusplus
@@ -13,7 +13,7 @@ typedef struct {
     size_t n;
 } GemmDims;
 
-static inline GemmDims extract_gemm_dims(const Tensor* a, const Tensor* b) {
+static inline GemmDims extract_gemm_dims(const tensor_desc* a, const tensor_desc* b) {
     GemmDims dims;
     dims.batch_dim = (a->ndim < 3) ? 0 : 1;
     for (size_t i = 0; i < a->ndim - 2; i++) {

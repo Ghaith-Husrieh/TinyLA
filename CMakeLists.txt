@@ -28,14 +28,15 @@ endif()
 # Core Sources
 # ===========================
 set(CORE_SOURCES
-    ${PROJECT_SOURCE_DIR}/src/tensor.c
     ${PROJECT_SOURCE_DIR}/src/init.c
     ${PROJECT_SOURCE_DIR}/src/memory/tla_alloc.c
+    ${PROJECT_SOURCE_DIR}/src/memory/tensor_desc.c
     ${PROJECT_SOURCE_DIR}/src/backend/dispatcher.c
     ${PROJECT_SOURCE_DIR}/src/backend/op_wrapper.c
     ${PROJECT_SOURCE_DIR}/src/cpu/cpu_features.c
     ${PROJECT_SOURCE_DIR}/src/cpu/alignment.c
     ${PROJECT_SOURCE_DIR}/src/rand/rand.cpp
+    ${PROJECT_SOURCE_DIR}/src/tensor.cpp
 )
 
 file(GLOB_RECURSE CPU_KERNELS 
@@ -117,7 +118,7 @@ set_target_properties(TinyLA PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 enable_testing()
 
 # CPU tests
-file(GLOB CPU_TEST_SOURCES ${PROJECT_SOURCE_DIR}/tests/test_cpu.c)
+file(GLOB CPU_TEST_SOURCES ${PROJECT_SOURCE_DIR}/tests/test_cpu.cpp)
 foreach(test_src ${CPU_TEST_SOURCES})
     get_filename_component(test_name ${test_src} NAME_WE)
     add_executable(${test_name} ${test_src})
@@ -128,7 +129,7 @@ endforeach()
 
 # GPU tests (only if CUDA is available)
 if(CUDAToolkit_FOUND)
-    file(GLOB GPU_TEST_SOURCES ${PROJECT_SOURCE_DIR}/tests/test_cuda.c)
+    file(GLOB GPU_TEST_SOURCES ${PROJECT_SOURCE_DIR}/tests/test_cuda.cpp)
     foreach(test_src ${GPU_TEST_SOURCES})
         get_filename_component(test_name ${test_src} NAME_WE)
         add_executable(${test_name} ${test_src})

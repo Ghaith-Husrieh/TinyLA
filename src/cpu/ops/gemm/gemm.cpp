@@ -3,9 +3,9 @@
 #include "impl.hpp"
 #include <omp.h>
 
-int cpu_gemm_scalar(Tensor* out, const Tensor** inputs, const size_t n_inputs) {
-    const Tensor* a = inputs[0];
-    const Tensor* b = inputs[1];
+int cpu_gemm_scalar(tensor_desc* out, const tensor_desc** inputs, const size_t n_inputs) {
+    const tensor_desc* a = inputs[0];
+    const tensor_desc* b = inputs[1];
 
     GemmDims dims = extract_gemm_dims(a, b);
 
@@ -20,9 +20,9 @@ int cpu_gemm_scalar(Tensor* out, const Tensor** inputs, const size_t n_inputs) {
     return 0;
 }
 
-int cpu_gemm_vec128(Tensor* out, const Tensor** inputs, const size_t n_inputs) {
-    const Tensor* a = inputs[0];
-    const Tensor* b = inputs[1];
+int cpu_gemm_vec128(tensor_desc* out, const tensor_desc** inputs, const size_t n_inputs) {
+    const tensor_desc* a = inputs[0];
+    const tensor_desc* b = inputs[1];
 
     GemmDims dims = extract_gemm_dims(a, b);
 
@@ -37,9 +37,9 @@ int cpu_gemm_vec128(Tensor* out, const Tensor** inputs, const size_t n_inputs) {
     return 0;
 }
 
-int cpu_gemm_vec256(Tensor* out, const Tensor** inputs, const size_t n_inputs) {
-    const Tensor* a = inputs[0];
-    const Tensor* b = inputs[1];
+int cpu_gemm_vec256(tensor_desc* out, const tensor_desc** inputs, const size_t n_inputs) {
+    const tensor_desc* a = inputs[0];
+    const tensor_desc* b = inputs[1];
 
     GemmDims dims = extract_gemm_dims(a, b);
 

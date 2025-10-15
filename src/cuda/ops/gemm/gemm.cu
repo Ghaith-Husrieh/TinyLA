@@ -31,9 +31,9 @@ __global__ void gemm_batched_kernel(double* out, const double* a, const double* 
     out[batch * m * n + row * n + col] = sum;
 }
 
-int cuda_gemm(Tensor* out, const Tensor** inputs, const size_t n_inputs) {
-    const Tensor* a = inputs[0];
-    const Tensor* b = inputs[1];
+int cuda_gemm(tensor_desc* out, const tensor_desc** inputs, const size_t n_inputs) {
+    const tensor_desc* a = inputs[0];
+    const tensor_desc* b = inputs[1];
 
     GemmDims dims = extract_gemm_dims(a, b);
     const size_t batch_count = dims.batch_dim ? dims.batch_dim : 1;

@@ -9,11 +9,11 @@
 #include <cuda_runtime.h>
 #endif
 
-void* tla_malloc(Device device, size_t bytes) {
+void* tla_malloc(device device, size_t bytes) {
     size_t required_bytes = bytes == 0 ? 1 : bytes;
 
 #ifdef TINYLA_CUDA_ENABLED
-    if (device == DEVICE_GPU) {
+    if (device == DEVICE_CUDA) {
         void* ptr = NULL;
         if (cudaMalloc(&ptr, required_bytes) != cudaSuccess)
             return NULL;
@@ -25,12 +25,12 @@ void* tla_malloc(Device device, size_t bytes) {
     return tla_aligned_malloc(required_bytes, alignment);
 }
 
-void tla_free(Device device, void* ptr) {
+void tla_free(device device, void* ptr) {
     if (!ptr)
         return;
 
 #ifdef TINYLA_CUDA_ENABLED
-    if (device == DEVICE_GPU) {
+    if (device == DEVICE_CUDA) {
         cudaFree(ptr);
         return;
     }
@@ -38,9 +38,9 @@ void tla_free(Device device, void* ptr) {
     tla_aligned_free(ptr);
 }
 
-int tla_memset_safe(Device device, void* ptr, int value, size_t bytes) {
+int tla_memset_safe(device device, void* ptr, int value, size_t bytes) {
 #ifdef TINYLA_CUDA_ENABLED
-    if (device == DEVICE_GPU) {
+    if (device == DEVICE_CUDA) {
         return cudaMemset(ptr, value, bytes) == cudaSuccess ? 0 : -1;
     }
 #endif
@@ -73,9 +73,9 @@ int tla_memcpy_safe(void* dst, const void* src, size_t bytes, TLAMemcpyKind kind
     }
 }
 
-void tla_memset(Device device, void* ptr, int value, size_t bytes) {
+void tla_memset(device device, void* ptr, int value, size_t bytes) {
 #ifdef TINYLA_CUDA_ENABLED
-    if (device == DEVICE_GPU) {
+    if (device == DEVICE_CUDA) {
         TLA_CUDA_CHECK(cudaMemset(ptr, value, bytes));
         return;
     }

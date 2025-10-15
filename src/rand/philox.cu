@@ -1,7 +1,7 @@
 #include "../cuda/cuda_macros.h"
+#include "memory/tensor_desc.h"
 #include "philox.hpp"
 #include "philox_common.hpp"
-#include "tinyla/tensor.h"
 #include <cuda_runtime.h>
 
 template <typename Generator> __global__ void philox_kernel(double* buffer, size_t numel, uint64_t seed) {
@@ -20,19 +20,19 @@ template <typename Generator> __global__ void philox_kernel(double* buffer, size
     }
 }
 
-template <typename Generator> Tensor* philox_tensor_gpu(const size_t* shape, size_t ndim, uint64_t seed) {
-    Tensor* tensor = empty_tensor(shape, ndim, DEVICE_GPU);
+template <typename Generator> tensor_desc* philox_tensor_gpu(const size_t* shape, size_t ndim, uint64_t seed) {
+    tensor_desc* desc = tensor_desc_create(NULL, shape, ndim, DEVICE_CUDA, buffer_init_mode::UNINITIALIZED);
 
     size_t threads = 256;
-    size_t blocks = (tensor->numel + 4 * threads - 1) / (4 * threads);
+    size_t blocks = (desc->numel + 4 * threads - 1) / (4 * threads);
 
-    philox_kernel<Generator><<<blocks, threads>>>(tensor->buffer, tensor->numel, seed);
+    philox_kernel<Generator><<<blocks, threads>>>(desc->buffer, desc->numel, seed);
     TLA_CUDA_KERNEL_CHECK();
 
-    return tensor;
+    return desc;
 }
 
 template __global__ void philox_kernel<PhiloxUniform>(double* buffer, size_t numel, uint64_t seed);
 template __global__ void philox_kernel<PhiloxNormal>(double* buffer, size_t numel, uint64_t seed);
-template Tensor* philox_tensor_gpu<PhiloxUniform>(const size_t* shape, size_t ndim, uint64_t seed);
-template Tensor* philox_tensor_gpu<PhiloxNormal>(const size_t* shape, size_t ndim, uint64_t seed);
+template tensor_desc* philox_tensor_gpu<PhiloxUniform>(const size_t* shape, size_t ndim, uint64_t seed);
+template tensor_desc* philox_tensor_gpu<PhiloxNormal>(const size_t* shape, size_t ndim, uint64_t seed);
