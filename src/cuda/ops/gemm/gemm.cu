@@ -14,7 +14,12 @@ __global__ void gemm_kernel(double* out, const double* a, const double* b, size_
         out[row * n + col] = sum;
     }
 }
-__global__ void gemm_batched_kernel(double* out, const double* a, const double* b, size_t m, size_t k, size_t n,
+__global__ void gemm_batched_kernel(double* out,
+                                    const double* a,
+                                    const double* b,
+                                    size_t m,
+                                    size_t k,
+                                    size_t n,
                                     size_t batch_count) {
     size_t batch = blockIdx.z;
     size_t row = blockIdx.y * blockDim.y + threadIdx.y;

@@ -18,8 +18,15 @@ struct GemmScalarOp {
         out[i * n + j] = sum;
     }
 
-    static void apply_batch(const double* a, const double* b_packed, double* out, size_t batch, size_t i, size_t j,
-                            size_t m, size_t k, size_t n) {
+    static void apply_batch(const double* a,
+                            const double* b_packed,
+                            double* out,
+                            size_t batch,
+                            size_t i,
+                            size_t j,
+                            size_t m,
+                            size_t k,
+                            size_t n) {
         const size_t a_offset = batch * m * k;
         const size_t b_packed_offset = batch * k * n;
         const size_t c_offset = batch * m * n;
@@ -63,8 +70,15 @@ struct GemmVec128Op {
         out[i * n + j] = result;
     }
 
-    static void apply_batch(const double* a, const double* b_packed, double* out, size_t batch, size_t i, size_t j,
-                            size_t m, size_t k, size_t n) {
+    static void apply_batch(const double* a,
+                            const double* b_packed,
+                            double* out,
+                            size_t batch,
+                            size_t i,
+                            size_t j,
+                            size_t m,
+                            size_t k,
+                            size_t n) {
         const size_t a_offset = batch * m * k;
         const size_t b_packed_offset = batch * k * n;
         const size_t c_offset = batch * m * n;
@@ -117,8 +131,15 @@ struct GemmVec256Op {
         out[i * n + j] = result;
     }
 
-    static void apply_batch(const double* a, const double* b_packed, double* out, size_t batch, size_t i, size_t j,
-                            size_t m, size_t k, size_t n) {
+    static void apply_batch(const double* a,
+                            const double* b_packed,
+                            double* out,
+                            size_t batch,
+                            size_t i,
+                            size_t j,
+                            size_t m,
+                            size_t k,
+                            size_t n) {
         const size_t a_offset = batch * m * k;
         const size_t b_packed_offset = batch * k * n;
         const size_t c_offset = batch * m * n;

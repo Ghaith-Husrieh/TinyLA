@@ -7,7 +7,10 @@
 tla::Tensor::Tensor(const std::vector<size_t> shape, tla::Device device, buffer_init_mode init_mode)
     : desc_(tensor_desc_create(NULL, shape.data(), shape.size(), static_cast<::device>(device), init_mode)) {}
 tla::Tensor::Tensor(const double* data, const std::vector<size_t> shape, tla::Device device)
-    : desc_(tensor_desc_create(data, shape.data(), shape.size(), static_cast<::device>(device),
+    : desc_(tensor_desc_create(data,
+                               shape.data(),
+                               shape.size(),
+                               static_cast<::device>(device),
                                buffer_init_mode::FROM_DATA)) {}
 tla::Tensor::Tensor(tensor_desc* desc) : desc_(desc) {}
 

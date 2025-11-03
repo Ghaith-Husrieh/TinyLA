@@ -22,8 +22,12 @@ static int validate_tensors(const tensor_desc** inputs, size_t n_inputs, const t
     device device = inputs[0]->device;
     for (size_t i = 1; i < n_inputs; i++) {
         if (inputs[i]->device != device) {
-            fprintf(stderr, "%s: input tensor %zu device mismatch: got %d, expected %d\n", op_name, i,
-                    inputs[i]->device, device);
+            fprintf(stderr,
+                    "%s: input tensor %zu device mismatch: got %d, expected %d\n",
+                    op_name,
+                    i,
+                    inputs[i]->device,
+                    device);
             return -1;
         }
     }
@@ -54,14 +58,21 @@ static int validate_tensors(const tensor_desc** inputs, size_t n_inputs, const t
         size_t dim_numel = inputs[0]->shape[dim];
         for (size_t i = 1; i < n_inputs; i++) {
             if (inputs[i]->shape[dim] != dim_numel) {
-                fprintf(stderr, "Shape mismatch at dim %zu: input %zu has size %zu, expected %zu\n", dim, i,
-                        inputs[i]->shape[dim], dim_numel);
+                fprintf(stderr,
+                        "Shape mismatch at dim %zu: input %zu has size %zu, expected %zu\n",
+                        dim,
+                        i,
+                        inputs[i]->shape[dim],
+                        dim_numel);
                 return -1;
             }
         }
 
         if (out->shape[dim] != dim_numel) {
-            fprintf(stderr, "Output tensor shape mismatch at dim %zu: got %zu, expected %zu\n", dim, out->shape[dim],
+            fprintf(stderr,
+                    "Output tensor shape mismatch at dim %zu: got %zu, expected %zu\n",
+                    dim,
+                    out->shape[dim],
                     dim_numel);
             return -1;
         }

@@ -30,7 +30,10 @@ void tensor_desc_free(tensor_desc** desc_ptr) {
     *desc_ptr = NULL;
 }
 
-tensor_desc* tensor_desc_create(const double* data, const size_t* shape, size_t ndim, device device,
+tensor_desc* tensor_desc_create(const double* data,
+                                const size_t* shape,
+                                size_t ndim,
+                                device device,
                                 buffer_init_mode init_mode) {
     tensor_desc* desc = calloc(1, sizeof(tensor_desc));
     if (!desc) {

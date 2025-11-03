@@ -299,7 +299,8 @@ class Tensor {
     Tensor operator^(const Tensor& other) const;
 
   private:
-    Tensor(const std::vector<size_t> shape, Device device,
+    Tensor(const std::vector<size_t> shape,
+           Device device,
            buffer_init_mode init_mode = buffer_init_mode::UNINITIALIZED);
     Tensor(const double* data, const std::vector<size_t> shape, Device device);
     Tensor(tensor_desc* desc);

@@ -23,7 +23,10 @@ typedef struct {
     device device;
 } tensor_desc;
 
-tensor_desc* tensor_desc_create(const double* data, const size_t* shape, size_t ndim, device device,
+tensor_desc* tensor_desc_create(const double* data,
+                                const size_t* shape,
+                                size_t ndim,
+                                device device,
                                 buffer_init_mode init_mode);
 tensor_desc* tensor_desc_to_device(tensor_desc* desc, device device, bool force_copy);
 void tensor_desc_free(tensor_desc** desc_ptr);

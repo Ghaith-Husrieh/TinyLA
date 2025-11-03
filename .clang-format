@@ -8,3 +8,9 @@ ContinuationIndentWidth: 8
 PointerAlignment: Left
 AlignAfterOpenBracket: Align
 ReflowComments: true
+BreakAfterReturnType: None
+BinPackParameters: false
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false
+PenaltyReturnTypeOnItsOwnLine: 1000000
