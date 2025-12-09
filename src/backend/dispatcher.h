@@ -20,21 +20,26 @@ typedef enum {
 } OpType;
 
 typedef enum {
+    OP_ELEMENT_WISE,
+    OP_GEMM,
+
+} OpKind;
+
+typedef enum {
     OP_ARITY_UNARY = 1,
     OP_ARITY_BINARY = 2,
     OP_ARITY_TERNARY = 3,
 } OpArity;
 
 typedef int (*DeviceKernel)(tensor_desc* out, const tensor_desc** inputs, const size_t n_inputs);
+typedef int (*OpValidator)(const tensor_desc** inputs, size_t n_inputs);
 
 typedef struct {
-    DeviceKernel scalar;
-    DeviceKernel vec128;
-    DeviceKernel vec256;
-} CpuKernels;
-
-typedef struct {
+    const char* verbose_name;
+    OpKind kind;
     OpArity arity;
+    OpValidator validator;
+
     DeviceKernel cpu_kernel;
 #ifdef TINYLA_CUDA_ENABLED
     DeviceKernel gpu_kernel;
@@ -42,12 +47,25 @@ typedef struct {
 } OpEntry;
 
 static OpEntry op_table[OP_COUNT];
+OpEntry* get_op_entry(OpType op);
+
+typedef struct {
+    DeviceKernel scalar;
+    DeviceKernel vec128;
+    DeviceKernel vec256;
+} CpuKernels;
 
 DeviceKernel select_cpu_kernel(const CpuKernels* kernels);
 DeviceKernel select_gpu_kernel(DeviceKernel gpu_kernel);
 
-int register_op(OpType op, OpArity arity, DeviceKernel cpu_k, DeviceKernel gpu_k);
-int dispatch_op(OpType op, tensor_desc* out, const tensor_desc** inputs, const size_t n_inputs);
+int register_op(const char* verbose_name,
+                OpType op,
+                OpKind kind,
+                OpArity arity,
+                OpValidator validator,
+                DeviceKernel cpu_k,
+                DeviceKernel gpu_k);
+int dispatch_kernel(const OpEntry* entry, const tensor_desc** inputs, const size_t n_inputs, tensor_desc* out);
 
 #ifdef __cplusplus
 }

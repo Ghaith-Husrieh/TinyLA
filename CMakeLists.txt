@@ -32,7 +32,7 @@ set(CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/memory/tla_alloc.c
     ${PROJECT_SOURCE_DIR}/src/memory/tensor_desc.c
     ${PROJECT_SOURCE_DIR}/src/backend/dispatcher.c
-    ${PROJECT_SOURCE_DIR}/src/backend/op_wrapper.c
+    ${PROJECT_SOURCE_DIR}/src/backend/validators.c
     ${PROJECT_SOURCE_DIR}/src/cpu/cpu_features.c
     ${PROJECT_SOURCE_DIR}/src/cpu/alignment.c
     ${PROJECT_SOURCE_DIR}/src/rand/rand.cpp

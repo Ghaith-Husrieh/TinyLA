@@ -1,4 +1,5 @@
 #pragma once
+#include "backend/dispatcher.h"
 #include "memory/tensor_desc.h"
 #include <cstddef>
 #include <vector>
@@ -191,10 +192,9 @@ class Tensor {
     /**
      * @brief Move tensor to a different device
      * @param device The target device
-     * @param force_copy Force a copy even if already on the target device
      * @return A new tensor on the target device
      */
-    Tensor to(Device device, bool force_copy = false) const;
+    Tensor to(Device device) const;
 
     /**
      * @brief Move tensor to CPU
@@ -222,42 +222,42 @@ class Tensor {
      * @param other The tensor to add
      * @return A new tensor with the result
      */
-    Tensor add(const Tensor& other) const;
+    inline Tensor add(const Tensor& other) const { return execute_binary_op(OP_ADD, other); }
 
     /**
      * @brief Element-wise subtraction
      * @param other The tensor to subtract
      * @return A new tensor with the result
      */
-    Tensor sub(const Tensor& other) const;
+    inline Tensor sub(const Tensor& other) const { return execute_binary_op(OP_SUB, other); }
 
     /**
      * @brief Element-wise multiplication
      * @param other The tensor to multiply with
      * @return A new tensor with the result
      */
-    Tensor mul(const Tensor& other) const;
+    inline Tensor mul(const Tensor& other) const { return execute_binary_op(OP_MUL, other); }
 
     /**
      * @brief Element-wise division
      * @param other The tensor to divide by
      * @return A new tensor with the result
      */
-    Tensor div(const Tensor& other) const;
+    inline Tensor div(const Tensor& other) const { return execute_binary_op(OP_DIV, other); }
 
     /**
      * @brief Element-wise power operation
      * @param other The tensor containing the exponents
      * @return A new tensor with the result
      */
-    Tensor pow(const Tensor& other) const;
+    inline Tensor pow(const Tensor& other) const { return execute_binary_op(OP_POW, other); }
 
     /**
      * @brief Matrix multiplication
      * @param other The tensor to multiply with
      * @return A new tensor with the result
      */
-    Tensor matmul(const Tensor& other) const;
+    inline Tensor matmul(const Tensor& other) const { return execute_binary_op(OP_MATMUL, other); }
 
     // ===========================
     // Operator Overloading
@@ -268,35 +268,35 @@ class Tensor {
      * @param other The tensor to add
      * @return A new tensor with the result
      */
-    Tensor operator+(const Tensor& other) const;
+    inline Tensor operator+(const Tensor& other) const { return add(other); }
 
     /**
      * @brief Element-wise subtraction operator
      * @param other The tensor to subtract
      * @return A new tensor with the result
      */
-    Tensor operator-(const Tensor& other) const;
+    inline Tensor operator-(const Tensor& other) const { return sub(other); }
 
     /**
      * @brief Element-wise multiplication operator
      * @param other The tensor to multiply with
      * @return A new tensor with the result
      */
-    Tensor operator*(const Tensor& other) const;
+    inline Tensor operator*(const Tensor& other) const { return mul(other); }
 
     /**
      * @brief Element-wise division operator
      * @param other The tensor to divide by
      * @return A new tensor with the result
      */
-    Tensor operator/(const Tensor& other) const;
+    inline Tensor operator/(const Tensor& other) const { return div(other); }
 
     /**
      * @brief Element-wise power operator
      * @param other The tensor containing the exponents
      * @return A new tensor with the result
      */
-    Tensor operator^(const Tensor& other) const;
+    inline Tensor operator^(const Tensor& other) const { return pow(other); }
 
   private:
     Tensor(const std::vector<size_t> shape,
@@ -305,22 +305,16 @@ class Tensor {
     Tensor(const double* data, const std::vector<size_t> shape, Device device);
     Tensor(tensor_desc* desc);
 
-    template <typename OpWrapper>
-    Tensor execute_binary_op(const Tensor& other, OpWrapper op_func, const char* op_name) const {
-        tensor_desc* out =
-                tensor_desc_create(NULL, desc_->shape, desc_->ndim, desc_->device, buffer_init_mode::UNINITIALIZED);
-        if (!out) {
-            fprintf(stderr, "Failed to allocate output tensor for %s\n", op_name);
-            return Tensor(nullptr);
-        }
+    Tensor infer_output_shape(OpKind kind, const tensor_desc** inputs, size_t n_inputs) const;
+    Tensor execute_op(OpType op, const tensor_desc** inputs, size_t n_inputs) const;
 
-        if (op_func(out, desc_, other.desc_) != 0) {
-            fprintf(stderr, "Failed to execute %s operation\n", op_name);
-            tensor_desc_free(&out);
-            return Tensor(nullptr);
-        }
-
-        return Tensor(out);
+    inline Tensor execute_unary_op(OpType op) const {
+        const tensor_desc* inputs[] = {desc_};
+        return execute_op(op, inputs, 1);
+    }
+    inline Tensor execute_binary_op(OpType op, const Tensor& other) const {
+        const tensor_desc* inputs[] = {desc_, other.desc_};
+        return execute_op(op, inputs, 2);
     }
 
     tensor_desc* desc_ = nullptr;

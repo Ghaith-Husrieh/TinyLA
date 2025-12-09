@@ -1,5 +1,4 @@
 #include "tinyla/tensor.hpp"
-#include "backend/op_wrapper.h"
 #include "memory/tensor_desc.h"
 #include "rand/rand.h"
 
@@ -77,26 +76,68 @@ double* tla::Tensor::data() { return desc_->buffer; }
 const double* tla::Tensor::data() const { return desc_->buffer; }
 
 // Device conversion
-tla::Tensor tla::Tensor::to(tla::Device device, bool force_copy) const {
-    return Tensor(tensor_desc_to_device(desc_, static_cast<::device>(device), force_copy));
+tla::Tensor tla::Tensor::to(tla::Device device) const {
+    return Tensor(tensor_desc_to_device(desc_, static_cast<::device>(device)));
 }
-tla::Tensor tla::Tensor::to_cpu() const { return to(tla::Device::CPU, false); }
-tla::Tensor tla::Tensor::to_cuda() const { return to(tla::Device::CUDA, false); }
+tla::Tensor tla::Tensor::to_cpu() const { return to(tla::Device::CPU); }
+tla::Tensor tla::Tensor::to_cuda() const { return to(tla::Device::CUDA); }
 
 // Printing
 void tla::Tensor::print() const { tensor_desc_print(desc_); }
 
-// Operations
-tla::Tensor tla::Tensor::add(const Tensor& other) const { return execute_binary_op(other, add_op_wrapper, "add"); }
-tla::Tensor tla::Tensor::sub(const Tensor& other) const { return execute_binary_op(other, sub_op_wrapper, "sub"); }
-tla::Tensor tla::Tensor::mul(const Tensor& other) const { return execute_binary_op(other, mul_op_wrapper, "mul"); }
-tla::Tensor tla::Tensor::div(const Tensor& other) const { return execute_binary_op(other, div_op_wrapper, "div"); }
-tla::Tensor tla::Tensor::pow(const Tensor& other) const { return execute_binary_op(other, pow_op_wrapper, "pow"); }
-tla::Tensor tla::Tensor::matmul(const Tensor& other) const {
-    return execute_binary_op(other, matmul_op_wrapper, "matmul");
+// Execute operations
+tla::Tensor tla::Tensor::infer_output_shape(OpKind kind, const tensor_desc** inputs, size_t n_inputs) const {
+    std::vector<size_t> output_shape;
+
+    switch (kind) {
+    case OP_ELEMENT_WISE:
+        output_shape = std::vector<size_t>(inputs[0]->shape, inputs[0]->shape + inputs[0]->ndim);
+        break;
+    case OP_GEMM:
+        for (size_t i = 0; i < inputs[0]->ndim - 2; i++) {
+            output_shape.push_back(inputs[0]->shape[i]);
+        }
+        output_shape.push_back(inputs[0]->shape[inputs[0]->ndim - 2]);
+        output_shape.push_back(inputs[1]->shape[inputs[1]->ndim - 1]);
+        break;
+    default:
+        fprintf(stderr, "Invalid operation kind: %d.", static_cast<int>(kind));
+        return Tensor(nullptr);
+    }
+
+    return empty(output_shape, static_cast<tla::Device>(inputs[0]->device));
 }
-tla::Tensor tla::Tensor::operator+(const Tensor& other) const { return add(other); }
-tla::Tensor tla::Tensor::operator-(const Tensor& other) const { return sub(other); }
-tla::Tensor tla::Tensor::operator*(const Tensor& other) const { return mul(other); }
-tla::Tensor tla::Tensor::operator/(const Tensor& other) const { return div(other); }
-tla::Tensor tla::Tensor::operator^(const Tensor& other) const { return pow(other); }
+
+tla::Tensor tla::Tensor::execute_op(OpType op, const tensor_desc** inputs, size_t n_inputs) const {
+    OpEntry* entry = get_op_entry(op);
+    if (!entry) {
+        fprintf(stderr, "Invalid operation: %d.", op);
+        return Tensor(nullptr);
+    }
+
+    if (entry->arity != n_inputs) {
+        fprintf(stderr,
+                "Arity mismatch for %s operation: expected %d, got %zu.",
+                entry->verbose_name,
+                entry->arity,
+                n_inputs);
+        return Tensor(nullptr);
+    }
+
+    if (!entry->validator) {
+        fprintf(stderr, "No validator registered for %s operation.", entry->verbose_name);
+        return Tensor(nullptr);
+    }
+
+    if (entry->validator(inputs, n_inputs) != 0) {
+        fprintf(stderr, "Validation failed for %s operation.", entry->verbose_name);
+        return Tensor(nullptr);
+    }
+
+    Tensor out = infer_output_shape(entry->kind, inputs, n_inputs);
+    if (dispatch_kernel(entry, inputs, n_inputs, out.desc_) != 0) {
+        fprintf(stderr, "Failed to execute %s operation.", entry->verbose_name);
+        return Tensor(nullptr);
+    }
+    return out;
+}

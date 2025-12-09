@@ -28,7 +28,20 @@ DeviceKernel select_gpu_kernel(DeviceKernel gpu_kernel) {
 #endif
 }
 
-int register_op(OpType op, OpArity arity, DeviceKernel cpu_k, DeviceKernel gpu_k) {
+OpEntry* get_op_entry(OpType op) {
+    if (op < 0 || op >= OP_COUNT) {
+        return NULL;
+    }
+    return &op_table[op];
+}
+
+int register_op(const char* verbose_name,
+                OpType op,
+                OpKind kind,
+                OpArity arity,
+                OpValidator validator,
+                DeviceKernel cpu_k,
+                DeviceKernel gpu_k) {
     if (op < 0 || op >= OP_COUNT) {
         fprintf(stderr, "Invalid op type: %d\n", op);
         return -1;
@@ -38,7 +51,10 @@ int register_op(OpType op, OpArity arity, DeviceKernel cpu_k, DeviceKernel gpu_k
         return -1;
     }
 
+    op_table[op].verbose_name = verbose_name;
+    op_table[op].kind = kind;
     op_table[op].arity = arity;
+    op_table[op].validator = validator;
     op_table[op].cpu_kernel = cpu_k;
 #ifdef TINYLA_CUDA_ENABLED
     op_table[op].gpu_kernel = gpu_k;
@@ -46,38 +62,25 @@ int register_op(OpType op, OpArity arity, DeviceKernel cpu_k, DeviceKernel gpu_k
     return 0;
 }
 
-int dispatch_op(OpType op, tensor_desc* out, const tensor_desc** inputs, const size_t n_inputs) {
-    if (op < 0 || op >= OP_COUNT) {
-        fprintf(stderr, "Invalid op type: %d\n", op);
-        return -1;
-    }
-
-    OpEntry* entry = &op_table[op];
-    if (entry->arity != n_inputs) {
-        fprintf(stderr, "Op %d expects %d inputs, but got %zu\n", op, entry->arity, n_inputs);
-        return -1;
-    }
-
+int dispatch_kernel(const OpEntry* entry, const tensor_desc** inputs, const size_t n_inputs, tensor_desc* out) {
     DeviceKernel kernel = NULL;
-    if (inputs[0]->device == DEVICE_CPU) {
+    if (out->device == DEVICE_CPU) {
         kernel = entry->cpu_kernel;
     }
 #ifdef TINYLA_CUDA_ENABLED
-    else if (inputs[0]->device == DEVICE_CUDA) {
+    else if (out->device == DEVICE_CUDA) {
         kernel = entry->gpu_kernel;
     }
 #endif
     else {
-        fprintf(stderr, "Unsupported device %d\n", inputs[0]->device);
+        fprintf(stderr, "Unsupported device %d\n", out->device);
         return -1;
     }
 
     if (!kernel) {
-        fprintf(stderr, "No kernel registered for op %d on device %d\n", op, inputs[0]->device);
+        fprintf(stderr, "No kernel registered for %s on device %d\n", entry->verbose_name, out->device);
         return -1;
     }
 
-    int result = kernel(out, inputs, n_inputs);
-
-    return result;
+    return kernel(out, inputs, n_inputs);
 }

@@ -138,12 +138,9 @@ cleanup:
     return NULL;
 }
 
-tensor_desc* tensor_desc_to_device(tensor_desc* desc, device device, bool force_copy) {
+tensor_desc* tensor_desc_to_device(const tensor_desc* desc, device device) {
     if (!desc) {
         return NULL;
-    }
-    if (desc->device == device && !force_copy) {
-        return (tensor_desc*)desc;
     }
 
     tensor_desc* out = tensor_desc_create(NULL, desc->shape, desc->ndim, device, UNINITIALIZED);
@@ -262,16 +259,24 @@ void tensor_desc_print(const tensor_desc* desc) {
     }
 
     // ===== Handle CUDA tensors =====
-    tensor_desc* host_desc = tensor_desc_to_device(desc, DEVICE_CPU, false);
-    if (!host_desc) {
-        fprintf(stderr, "Failed to copy tensor to host for printing\n");
-        return;
+    tensor_desc* host_desc = NULL;
+    bool need_free = false;
+    if (desc->device == DEVICE_CPU) {
+        host_desc = (tensor_desc*)desc;
+        need_free = false;
+    } else {
+        host_desc = tensor_desc_to_device(desc, DEVICE_CPU);
+        if (!host_desc) {
+            fprintf(stderr, "Failed to copy tensor to host for printing\n");
+            return;
+        }
+        need_free = true;
     }
 
     // ===== Special case: 0D scalar =====
     if (desc->ndim == 0) {
         double scalar = host_desc->buffer[0];
-        if (host_desc != desc) {
+        if (need_free) {
             tensor_desc_free(&host_desc);
         }
 
@@ -284,7 +289,7 @@ void tensor_desc_print(const tensor_desc* desc) {
     tensor_desc_print_recursive(host_desc, 0, 0, 7);
     printf(", device=%s, dtype=float64)\n", desc->device == DEVICE_CPU ? "cpu" : "cuda");
 
-    if (host_desc != desc) {
+    if (need_free) {
         tensor_desc_free(&host_desc);
     }
 }
