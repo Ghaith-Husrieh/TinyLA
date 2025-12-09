@@ -37,7 +37,7 @@ tensor_desc* tensor_desc_create(const double* data,
                                 buffer_init_mode init_mode) {
     tensor_desc* desc = calloc(1, sizeof(tensor_desc));
     if (!desc) {
-        fprintf(stderr, "Failed to allocate memory for tensor_desc\n");
+        fprintf(stderr, "Failed to allocate memory for tensor_desc.\n");
         return NULL;
     }
 
@@ -51,12 +51,12 @@ tensor_desc* tensor_desc_create(const double* data,
         desc->shape = NULL;
         desc->buffer = tla_malloc(device, sizeof(double));
         if (!desc->buffer) {
-            fprintf(stderr, "Failed to allocate memory for buffer\n");
+            fprintf(stderr, "Failed to allocate memory for buffer.\n");
             goto cleanup;
         }
     } else {
         if (!shape) {
-            fprintf(stderr, "Shape must be provided\n");
+            fprintf(stderr, "Shape must be provided.\n");
             goto cleanup;
         }
 
@@ -67,7 +67,7 @@ tensor_desc* tensor_desc_create(const double* data,
 
         desc->shape = malloc(ndim * sizeof(size_t));
         if (!desc->shape) {
-            fprintf(stderr, "Failed to allocate memory for shape\n");
+            fprintf(stderr, "Failed to allocate memory for shape.\n");
             goto cleanup;
         }
         memcpy(desc->shape, shape, ndim * sizeof(size_t));
@@ -75,7 +75,7 @@ tensor_desc* tensor_desc_create(const double* data,
         if (numel == 0) {
             desc->buffer = tla_malloc(device, 0);
             if (!desc->buffer) {
-                fprintf(stderr, "Failed to allocate memory for buffer\n");
+                fprintf(stderr, "Failed to allocate memory for buffer.\n");
                 goto cleanup;
             }
             goto finalize;
@@ -83,7 +83,7 @@ tensor_desc* tensor_desc_create(const double* data,
 
         desc->buffer = tla_malloc(device, numel * sizeof(double));
         if (!desc->buffer) {
-            fprintf(stderr, "Failed to allocate memory for buffer\n");
+            fprintf(stderr, "Failed to allocate memory for buffer.\n");
             goto cleanup;
         }
     }
@@ -91,17 +91,17 @@ tensor_desc* tensor_desc_create(const double* data,
     switch (init_mode) {
     case FROM_DATA:
         if (!data) {
-            fprintf(stderr, "Data must be provided for init mode FROM_DATA\n");
+            fprintf(stderr, "Data must be provided for init mode FROM_DATA.\n");
             goto cleanup;
         }
         if (device == DEVICE_CUDA) {
             if (tla_memcpy_safe(desc->buffer, data, numel * sizeof(double), TLA_MEMCPY_HOST_TO_DEVICE) != 0) {
-                fprintf(stderr, "Failed to copy data to tensor buffer on device %d\n", device);
+                fprintf(stderr, "Failed to copy data to tensor buffer on device %d.\n", device);
                 goto cleanup;
             }
         } else {
             if (tla_memcpy_safe(desc->buffer, data, numel * sizeof(double), TLA_MEMCPY_HOST_TO_HOST) != 0) {
-                fprintf(stderr, "Failed to copy data to tensor buffer on device %d\n", device);
+                fprintf(stderr, "Failed to copy data to tensor buffer on device %d.\n", device);
                 goto cleanup;
             }
         }
@@ -110,7 +110,7 @@ tensor_desc* tensor_desc_create(const double* data,
         break;
     case ZEROS:
         if (tla_memset_safe(device, desc->buffer, 0, numel * sizeof(double)) != 0) {
-            fprintf(stderr, "Failed to zero tensor buffer on device %d\n", device);
+            fprintf(stderr, "Failed to zero tensor buffer on device %d.\n", device);
             goto cleanup;
         }
         break;
@@ -126,7 +126,7 @@ tensor_desc* tensor_desc_create(const double* data,
 #endif
         break;
     default:
-        fprintf(stderr, "Invalid initialization mode\n");
+        fprintf(stderr, "Invalid initialization mode.\n");
         goto cleanup;
     }
 
@@ -159,7 +159,7 @@ tensor_desc* tensor_desc_to_device(const tensor_desc* desc, device device) {
 #endif
 
     if (tla_memcpy_safe(out->buffer, desc->buffer, desc->numel * sizeof(double), kind) != 0) {
-        fprintf(stderr, "Failed to copy tensor buffer in to_device()\n");
+        fprintf(stderr, "Failed to copy tensor buffer in to_device().\n");
         tensor_desc_free(&out);
         return NULL;
     }
@@ -267,7 +267,7 @@ void tensor_desc_print(const tensor_desc* desc) {
     } else {
         host_desc = tensor_desc_to_device(desc, DEVICE_CPU);
         if (!host_desc) {
-            fprintf(stderr, "Failed to copy tensor to host for printing\n");
+            fprintf(stderr, "Failed to copy tensor to host for printing.\n");
             return;
         }
         need_free = true;

@@ -101,7 +101,7 @@ tla::Tensor tla::Tensor::infer_output_shape(OpKind kind, const tensor_desc** inp
         output_shape.push_back(inputs[1]->shape[inputs[1]->ndim - 1]);
         break;
     default:
-        fprintf(stderr, "Invalid operation kind: %d.", static_cast<int>(kind));
+        fprintf(stderr, "Invalid operation kind: %d.\n", static_cast<int>(kind));
         return Tensor(nullptr);
     }
 
@@ -111,13 +111,13 @@ tla::Tensor tla::Tensor::infer_output_shape(OpKind kind, const tensor_desc** inp
 tla::Tensor tla::Tensor::execute_op(OpType op, const tensor_desc** inputs, size_t n_inputs) const {
     OpEntry* entry = get_op_entry(op);
     if (!entry) {
-        fprintf(stderr, "Invalid operation: %d.", op);
+        fprintf(stderr, "Invalid operation: %d.\n", op);
         return Tensor(nullptr);
     }
 
     if (entry->arity != n_inputs) {
         fprintf(stderr,
-                "Arity mismatch for %s operation: expected %d, got %zu.",
+                "Arity mismatch for %s operation: expected %d, got %zu.\n",
                 entry->verbose_name,
                 entry->arity,
                 n_inputs);
@@ -125,18 +125,18 @@ tla::Tensor tla::Tensor::execute_op(OpType op, const tensor_desc** inputs, size_
     }
 
     if (!entry->validator) {
-        fprintf(stderr, "No validator registered for %s operation.", entry->verbose_name);
+        fprintf(stderr, "No validator registered for %s operation.\n", entry->verbose_name);
         return Tensor(nullptr);
     }
 
     if (entry->validator(inputs, n_inputs) != 0) {
-        fprintf(stderr, "Validation failed for %s operation.", entry->verbose_name);
+        fprintf(stderr, "Validation failed for %s operation.\n", entry->verbose_name);
         return Tensor(nullptr);
     }
 
     Tensor out = infer_output_shape(entry->kind, inputs, n_inputs);
     if (dispatch_kernel(entry, inputs, n_inputs, out.desc_) != 0) {
-        fprintf(stderr, "Failed to execute %s operation.", entry->verbose_name);
+        fprintf(stderr, "Failed to execute %s operation.\n", entry->verbose_name);
         return Tensor(nullptr);
     }
     return out;

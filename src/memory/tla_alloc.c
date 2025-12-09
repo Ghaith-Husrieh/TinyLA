@@ -64,10 +64,10 @@ int tla_memcpy_safe(void* dst, const void* src, size_t bytes, TLAMemcpyKind kind
     default:
         if (kind == TLA_MEMCPY_HOST_TO_DEVICE || kind == TLA_MEMCPY_DEVICE_TO_HOST ||
             kind == TLA_MEMCPY_DEVICE_TO_DEVICE) {
-            fprintf(stderr, "TinyLA was compiled without CUDA support\n");
+            fprintf(stderr, "TinyLA was compiled without CUDA support.\n");
             return -1;
         } else {
-            fprintf(stderr, "Invalid memcpy kind: %d\n", kind);
+            fprintf(stderr, "Invalid memcpy kind: %d.\n", kind);
             return -1;
         }
     }
@@ -102,10 +102,10 @@ void tla_memcpy(void* dst, const void* src, size_t bytes, TLAMemcpyKind kind) {
     default:
         if (kind == TLA_MEMCPY_HOST_TO_DEVICE || kind == TLA_MEMCPY_DEVICE_TO_HOST ||
             kind == TLA_MEMCPY_DEVICE_TO_DEVICE) {
-            fprintf(stderr, "TinyLA was compiled without CUDA support\n");
+            fprintf(stderr, "TinyLA was compiled without CUDA support.\n");
             break;
         } else {
-            fprintf(stderr, "Invalid memcpy kind: %d\n", kind);
+            fprintf(stderr, "Invalid memcpy kind: %d.\n", kind);
             break;
         }
     }

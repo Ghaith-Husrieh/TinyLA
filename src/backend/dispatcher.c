@@ -43,11 +43,11 @@ int register_op(const char* verbose_name,
                 DeviceKernel cpu_k,
                 DeviceKernel gpu_k) {
     if (op < 0 || op >= OP_COUNT) {
-        fprintf(stderr, "Invalid op type: %d\n", op);
+        fprintf(stderr, "Invalid op type: %d.\n", op);
         return -1;
     }
     if (arity < OP_ARITY_UNARY || arity > OP_ARITY_TERNARY) {
-        fprintf(stderr, "Invalid op arity: %d\n", arity);
+        fprintf(stderr, "Invalid op arity: %d.\n", arity);
         return -1;
     }
 
@@ -73,12 +73,12 @@ int dispatch_kernel(const OpEntry* entry, const tensor_desc** inputs, const size
     }
 #endif
     else {
-        fprintf(stderr, "Unsupported device %d\n", out->device);
+        fprintf(stderr, "Unsupported device %d.\n", out->device);
         return -1;
     }
 
     if (!kernel) {
-        fprintf(stderr, "No kernel registered for %s on device %d\n", entry->verbose_name, out->device);
+        fprintf(stderr, "No kernel registered for %s on device %d.\n", entry->verbose_name, out->device);
         return -1;
     }
 
